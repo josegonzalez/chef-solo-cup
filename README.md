@@ -18,15 +18,21 @@ Commands:
     # get a summary of running instances with regions
     chef-solo-flight status (group)
 
-    # bring up a set of instances
-    chef-solo-flight up <group> --number {number} --region {region} --size {size} --before {run this before} --after {run this after} --parallel
-
-    # bring down a set of instances
-    chef-solo-flight down <group> --number {number} --region {region} --size {size} --before {run this before} --after {run this after} --parallel
+    # start|stop|terminate a set of instances
+    chef-solo-flight start|stop|terminate
+                        <group>
+                        --number {number}
+                        --region {region}
+                        --size {size}
+                        --before {run this before}
+                        --after {run this after}
+                        --parallel
 
     # update a set of instances
     # will not update instances by default, must specify a group or the flag
-    chef-solo-flight update (group) --all --parallel
+    chef-solo-flight update (group)
+                        --all
+                        --parallel
 
 Explanation of arguments and flags:
 
@@ -51,12 +57,8 @@ Below is the hypothetical contents of `boxes/bee.json`
             "service": "sg",
             "storage": [
                 {
-                    "size": "200",
-                    "mount": "/dev/sdf"
-                },
-                {
                     "size": "50",
-                    "mount": "/dev/sdg",
+                    "mount": "/dev/sdf",
                     "snapshot": "343qu4rhiqhe"
                 }
             ],
@@ -75,6 +77,8 @@ In our case, you will notice that we can specify storage units to attach to an i
 There is also a special `service` key, for use in creating instance dna, as follows:
 
     `:service-:box_group-:provider-:region_shorthand-:number.json`
+
+The name of the box would
 
 These keys are defined as follows:
 
@@ -103,6 +107,10 @@ Every chef-solo-cup installation has access to a `solo-cup-config.rb` configurat
     # Turn on parallel deploys, it's off by default
     parallel                true
 
+    # Path to generated dna files
+    dna_path                "./recipes/dna"
+    dna_name_template       ":service-:box_group-:provider-:region_shorthand-:number"
+
     # aws auth info
     aws_access_key_id:      AAAAAAAAAAAAAAAAAAAA
     aws_secret_access_key:  iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
@@ -111,3 +119,36 @@ Every chef-solo-cup installation has access to a `solo-cup-config.rb` configurat
     chef_version            0.10.10
     ohai_version            0.6.10
     ruby_version            1.9.2
+
+## DNA Generation
+
+Generated dna would follow whatever box group you specify, plus custom configuration available within `_box`. If bringing up 1 more `bee` instance using our above box group, and we already had 4 `bee` instances, the following would be the generated `dna.json`
+
+    {
+        "_box": {
+            "service": "sg",
+            "storage": [
+                {
+                    "size": "50",
+                    "mount": "/dev/sdf",
+                    "snapshot": "343qu4rhiqhe"
+                }
+            ],
+            "region": "us-east-1a",
+            "size": "c1.medium",
+            "provider": "ec2",
+            "ami": "ami-6fa27506"
+        }
+        "box_name": "bee-ec2-05",
+        "run_list": [
+            "role[bee]"
+        ]
+    }
+
+The dna files would be placed in `./recipes/dna` by default, and deployed from that path. In this way, you can have your dna files as either part of your chef cookbooks or a submodule thereof.
+
+DNA files will be generated to the following path:
+
+    :dna_path/:provider/:region/:dna_name_template.json
+
+This dna path is used in order to allow quicker filtering by chef-solo-flight.
