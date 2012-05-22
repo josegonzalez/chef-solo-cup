@@ -54,19 +54,20 @@ Below is the hypothetical contents of `boxes/bee.json`
 
     {
         "_box": {
-            "service": "sg",
+            "service":          "sg",
             "storage": [
                 {
-                    "size": "50",
-                    "mount": "/dev/sdf",
+                    "size":     "50",
+                    "mount":    "/dev/sdf",
                     "snapshot": "343qu4rhiqhe"
                 }
             ],
-            "region": "us-east-1a",
-            "size": "c1.medium",
-            "provider": "ec2",
-            "ami": "ami-6fa27506"
-        }
+            "region":           "us-east-1a",
+            "size":             "c1.medium",
+            "provider":         "ec2",
+            "ami":              "ami-6fa27506",
+            "security_groups":  [ "sg-123456", "sg-789012" ]
+        },
         "run_list": [
             "role[bee]"
         ]
@@ -100,6 +101,9 @@ Every chef-solo-cup installation has access to a `solo-cup-config.rb` configurat
     region                  "us-east-1a"
     size                    "c1.medium"
     ami                     "ami-6fa27506"
+    # These are defaults, and other groups are merged ONTO these
+    # default is the "default" security group
+    security_groups         [ "sg-123456", "sg-789012" ]
 
     # Limit overrides to the following keys
     allow_override          [ :ami, :size ]
@@ -126,19 +130,20 @@ Generated dna would follow whatever box group you specify, plus custom configura
 
     {
         "_box": {
-            "service": "sg",
+            "service":          "sg",
             "storage": [
                 {
-                    "size": "50",
-                    "mount": "/dev/sdf",
+                    "size":     "50",
+                    "mount":    "/dev/sdf",
                     "snapshot": "343qu4rhiqhe"
                 }
             ],
-            "region": "us-east-1a",
-            "size": "c1.medium",
-            "provider": "ec2",
-            "ami": "ami-6fa27506"
-        }
+            "region":           "us-east-1a",
+            "size":             "c1.medium",
+            "provider":         "ec2",
+            "ami":              "ami-6fa27506",
+            "security_groups":  [ "sg-123456", "sg-789012" ]
+        },
         "box_name": "bee-ec2-05",
         "run_list": [
             "role[bee]"
