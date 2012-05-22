@@ -161,3 +161,19 @@ This dna path is used in order to allow quicker filtering by chef-solo-flight.
 ## DNS Integration
 
 Handle this within a recipe. Tooling to do this will only get it wrong. You can use `node[:box_name]` to figure out what the alias should be for the instance.
+
+## Referencing other nodes
+
+How do we simulate chef-server? The primary reason why you'd want to know of different nodes is to be able to write configuration files to services, datastores, etc. based upon the other nodes.
+
+Because we know the roles of other nodes, it may be possible to load up the json for each node within a `nodes` attribute in the `dna.json`. This can be dynamic and compiled once at runtime, then merged in.
+
+Potential issues:
+
+- Because you are provisioning new servers all the time, how do you notify old servers that the new ones are up?
+  * Could have a note after the commands that detects changes in the config - `up` and `down` change stuff by default, `update` can be detected as a change by hashing existing json against server json - and provides a note to the user to update all the instances as appropriate
+- DNS from new instances would be nice to have in other instances `/etc/hosts` file
+  * `chef-solo-cup bulk` might be able to toss a single `dna.json` at all the instances - as filtered by flags - so we can quickly run some recipes to update key infrastructure
+- No search capabilities, do not know inline what libraries are installed or packages etc.
+  * Your recipes should be clear as to what library is installed on what node, so then you can infer this based upon the box group.
+
