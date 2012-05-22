@@ -157,3 +157,7 @@ DNA files will be generated to the following path:
     :dna_path/:provider/:region/:dna_name_template.json
 
 This dna path is used in order to allow quicker filtering by chef-solo-flight.
+
+## DNS Integration
+
+Handle this within a recipe. Tooling to do this will only get it wrong. You can use `node[:box_name]` to figure out what the alias should be for the instance.
