@@ -79,7 +79,7 @@ There is also a special `service` key, for use in creating instance dna, as foll
 
     `:service-:box_group-:provider-:region_shorthand-:number.json`
 
-The name of the box would
+The name of the box would be the same as the filename, without the `json` extension.
 
 These keys are defined as follows:
 
@@ -144,7 +144,7 @@ Generated dna would follow whatever box group you specify, plus custom configura
             "ami":              "ami-6fa27506",
             "security_groups":  [ "sg-123456", "sg-789012" ]
         },
-        "box_name": "bee-ec2-05",
+        "box_name": "sg-bee-ec2-use1a-05",
         "run_list": [
             "role[bee]"
         ]
