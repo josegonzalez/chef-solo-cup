@@ -7,19 +7,19 @@ Chef Solo Cup is a wrapper around chef-solo, for booting/updating AWS instances
 Commands:
 
     # the binary
-    chef-solo-flight
+    chef-solo-cup
 
     # running commands
-    chef-solo-flight [command] <required argument> (optional argument) -f {optional flag}
+    chef-solo-cup [command] <required argument> (optional argument) -f {optional flag}
 
     # run help
-    chef-solo-flight help
+    chef-solo-cup help
 
     # get a summary of running instances with regions
-    chef-solo-flight status (group)
+    chef-solo-cup status (group)
 
     # start|stop|terminate a set of instances
-    chef-solo-flight start|stop|terminate
+    chef-solo-cup start|stop|terminate
                         <group>
                         --number {number}
                         --region {region}
@@ -30,7 +30,7 @@ Commands:
 
     # update a set of instances
     # will not update instances by default, must specify a group or the flag
-    chef-solo-flight update (group)
+    chef-solo-cup update (group)
                         --all
                         --parallel
 
