@@ -75,6 +75,8 @@ Below is the hypothetical contents of `boxes/bee.json`
 
 In our case, you will notice that we can specify storage units to attach to an instance, region to allocate the instances in, as well as instance size. These go under the `_box` top-level key, and all other key/values in the `box.json` file are copied into the dna.json for a particular instance.
 
+`_box` is a MAGIC key. DO NOT USE IT FOR YOUR OWN USES. It should only be used to define box groups.
+
 There is also a special `service` key, for use in creating instance dna, as follows:
 
     `:service-:box_group-:provider-:region_shorthand-:number.json`
