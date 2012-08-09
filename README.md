@@ -36,7 +36,7 @@ Commands:
 
 Explanation of arguments and flags:
 
-* group:      Name of the box group to use; see below for a thorough explanation of a box group
+* group:      Name of the box group to use; see below for a thorough explanation of a box group. Also supports regex for box groups.
 * number:     Number of instances to affect. For bringing down instances, will affect the last n instances
 * region:     Region of amazon which this command will run against. Will attempt to balance load across zones
 * size:       Size of boxes to bring up, like c1.medium or m1.large
@@ -123,8 +123,8 @@ Every chef-solo-cup installation has access to a `solo-cup-config.rb` configurat
 
     # stuff for chef/ruby
     chef_version            0.10.10
-    ohai_version            0.6.10
-    ruby_version            1.9.2
+    ohai_version            6.14.0
+    chef_version            10.12.0
 
 ## DNA Generation
 
@@ -158,7 +158,7 @@ DNA files will be generated to the following path:
 
     :dna_path/:provider/:region/:dna_name_template.json
 
-This dna path is used in order to allow quicker filtering by chef-solo-flight.
+This dna path is used in order to allow quicker filtering by chef-solo-cup.
 
 ## DNS Integration
 
