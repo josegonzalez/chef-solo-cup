@@ -1,10 +1,13 @@
-# chef-solo-cup
+=============
+chef-solo-cup
+=============
 
 Chef Solo Cup is a wrapper around chef-solo, for booting/updating AWS instances
 
-# Technical Description
+Technical Description
+=====================
 
-Commands:
+Commands::
 
     # the binary
     chef-solo-cup
@@ -45,11 +48,14 @@ Explanation of arguments and flags:
 * parallel:   Run chef-solo-flight in parallel against all of these instances. Might be funky.
 * all:        Run against all availabe instances
 
-## Box Groups
+Box Groups
+==========
 
 A box group is a definition for a set of servers. In a typical server-oriented architecture, you will have several servers that will serve the same purpose. For example, it may be necessary to have 10 background workers, each having a particular set of storage volumes. These would all most likely use the same exact chef setup, and rather than duplicate this in many json files, we will create a single json "template" with this information baked in.
 
-Below is the hypothetical contents of `boxes/bee.json`
+Below is the hypothetical contents of ``boxes/bee.json``:
+
+::
 
 
     {
@@ -73,29 +79,32 @@ Below is the hypothetical contents of `boxes/bee.json`
         ]
     }
 
-In our case, you will notice that we can specify storage units to attach to an instance, region to allocate the instances in, as well as instance size. These go under the `_box` top-level key, and all other key/values in the `box.json` file are copied into the dna.json for a particular instance.
+In our case, you will notice that we can specify storage units to attach to an instance, region to allocate the instances in, as well as instance size. These go under the ``_box`` top-level key, and all other key/values in the ``box.json`` file are copied into the dna.json for a particular instance.
 
-`_box` is a MAGIC key. DO NOT USE IT FOR YOUR OWN USES. It should only be used to define box groups.
+``_box`` is a MAGIC key. DO NOT USE IT FOR YOUR OWN USES. It should only be used to define box groups.
 
-There is also a special `service` key, for use in creating instance dna, as follows:
+There is also a special ``service`` key, for use in creating instance dna, as follows::
 
-    `:service-:box_group-:provider-:region_shorthand-:number.json`
+    ``:service-:box_group-:provider-:region_shorthand-:number.json``
 
-The name of the box would be the same as the filename, without the `json` extension.
+The name of the box would be the same as the filename, without the ``json`` extension.
 
 These keys are defined as follows:
 
 * service:          What is this service's name? Useful when managing pieces of infrastructure that are mostly independent, such as different websites under a single umbrella organization
-* box_group:        The name which is guessed from your box group json file. In the above json, this would be `bee`
-* provider:         The name of the cloud provider. At the moment, this defaults to `ec2`. No others are supported at the moment
-* region_shorthand: All regions in aws are given a shorthand, such as `use1a` for `us-east-1a`. Pretty easy to guess these, and it is automatically guessed from the `region` selected in either your box group or as a flag to `chef-solo-cup`.
+* box_group:        The name which is guessed from your box group json file. In the above json, this would be ``bee``
+* provider:         The name of the cloud provider. At the moment, this defaults to ``ec2``. No others are supported at the moment
+* region_shorthand: All regions in aws are given a shorthand, such as ``use1a`` for ``us-east-1a``. Pretty easy to guess these, and it is automatically guessed from the ``region`` selected in either your box group or as a flag to ``chef-solo-cup``.
 * number:           Instance number. This is derived from the number of instances currently deployed, as well as the number of instances being deployed. Will be a zero padded 5-digit number.
 
-You may also override the naming schema if you think you'll only use a single region, or will have multiple chef-solo-cup installations. This may be overriden in your `solo-cup-config.rb` file.
+You may also override the naming schema if you think you'll only use a single region, or will have multiple chef-solo-cup installations. This may be overriden in your ``solo-cup-config.rb`` file.
 
-## Configuration Management
+Configuration Management
+========================
 
-Every chef-solo-cup installation has access to a `solo-cup-config.rb` configuration file. Other than storage, default box configuration can be specified here. `_box` configuration from a specific box group will be merged ONTO the config in `solo-cup-config.rb`. These can be overwritten at runtime using arguments on the `chef-solo-cup` command.
+Every chef-solo-cup installation has access to a ``solo-cup-config.rb`` configuration file. Other than storage, default box configuration can be specified here. ``_box`` configuration from a specific box group will be merged ONTO the config in ``solo-cup-config.rb``. These can be overwritten at runtime using arguments on the ``chef-solo-cup`` command.
+
+::
 
     # A sample solo-cup-config.rb
     # some good defaults
@@ -126,9 +135,12 @@ Every chef-solo-cup installation has access to a `solo-cup-config.rb` configurat
     ohai_version            6.14.0
     chef_version            10.12.0
 
-## DNA Generation
+DNA Generation
+==============
 
-Generated dna would follow whatever box group you specify, plus custom configuration available within `_box`. If bringing up 1 more `bee` instance using our above box group, and we already had 4 `bee` instances, the following would be the generated `dna.json`
+Generated dna would follow whatever box group you specify, plus custom configuration available within ``_box``. If bringing up 1 more ``bee`` instance using our above box group, and we already had 4 ``bee`` instances, the following would be the generated ``dna.json``
+
+::
 
     {
         "_box": {
@@ -152,30 +164,32 @@ Generated dna would follow whatever box group you specify, plus custom configura
         ]
     }
 
-The dna files would be placed in `./recipes/dna` by default, and deployed from that path. In this way, you can have your dna files as either part of your chef cookbooks or a submodule thereof.
+The dna files would be placed in ``./recipes/dna`` by default, and deployed from that path. In this way, you can have your dna files as either part of your chef cookbooks or a submodule thereof.
 
-DNA files will be generated to the following path:
+DNA files will be generated to the following path::
 
     :dna_path/:provider/:region/:dna_name_template.json
 
 This dna path is used in order to allow quicker filtering by chef-solo-cup.
 
-## DNS Integration
+DNS Integration
+===============
 
-Handle this within a recipe. Tooling to do this will only get it wrong. You can use `node[:box_name]` to figure out what the alias should be for the instance.
+Handle this within a recipe. Tooling to do this will only get it wrong. You can use ``node[:box_name]`` to figure out what the alias should be for the instance.
 
-## Referencing other nodes
+Referencing other nodes
+=======================
 
 How do we simulate chef-server? The primary reason why you'd want to know of different nodes is to be able to write configuration files to services, datastores, etc. based upon the other nodes.
 
-Because we know the roles of other nodes, it may be possible to load up the json for each node within a `nodes` attribute in the `dna.json`. This can be dynamic and compiled once at runtime, then merged in.
+Because we know the roles of other nodes, it may be possible to load up the json for each node within a ``nodes`` attribute in the ``dna.json``. This can be dynamic and compiled once at runtime, then merged in.
 
 Potential issues:
 
 - Because you are provisioning new servers all the time, how do you notify old servers that the new ones are up?
-  * Could have a note after the commands that detects changes in the config - `up` and `down` change stuff by default, `update` can be detected as a change by hashing existing json against server json - and provides a note to the user to update all the instances as appropriate
-- DNS from new instances would be nice to have in other instances `/etc/hosts` file
-  * `chef-solo-cup bulk` might be able to toss a single `dna.json` at all the instances - as filtered by flags - so we can quickly run some recipes to update key infrastructure
+  * Could have a note after the commands that detects changes in the config - ``up`` and ``down`` change stuff by default, ``update`` can be detected as a change by hashing existing json against server json - and provides a note to the user to update all the instances as appropriate
+- DNS from new instances would be nice to have in other instances ``/etc/hosts`` file
+  * ``chef-solo-cup bulk`` might be able to toss a single ``dna.json`` at all the instances - as filtered by flags - so we can quickly run some recipes to update key infrastructure
 - No search capabilities, do not know inline what libraries are installed or packages etc.
   * Your recipes should be clear as to what library is installed on what node, so then you can infer this based upon the box group.
 
