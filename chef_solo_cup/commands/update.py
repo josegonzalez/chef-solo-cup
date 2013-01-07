@@ -10,4 +10,4 @@ def update(args, config, logger=None):
 
     sync_cookbooks(args, config, logger=logger)
 
-    sudo_dry("source /etc/profile && `which chef-solo` -c {0}/solo-config.rb -j {0}/dna/{1} -l {2}".format(args.file_dest, config.get('dna_path'), args.loglevel), args, logger=logger)
+    sudo_dry("source /etc/profile && `which chef-solo` -c {0}/solo-config.rb -j {0}/dna/{1} -l {2}".format(args.chef_file_dest, config.get('dna_path'), args.loglevel), args, logger=logger)
