@@ -193,3 +193,39 @@ Potential issues:
 - No search capabilities, do not know inline what libraries are installed or packages etc.
   * Your recipes should be clear as to what library is installed on what node, so then you can infer this based upon the box group.
 
+#
+# usage: chef-solo-cup [-h] [-c CMD] [-d DNA_PATTERNS [DNA_PATTERNS ...]]
+#                      [-k KEY_FILENAME] [-l {debug,info,warn,error,fatal}]
+#                      [-p [PROVIDERS [PROVIDERS ...]]]
+#                      [-r [REGIONS [REGIONS ...]]]
+#                      [-s [SERVICES [SERVICES ...]]] [-u USER] [-v]
+#                      {bootstrap,default,gem,ruby,run,sudo,test,update}
+#
+# Chef-solo-cup, a chef-solo wrapper
+#
+# positional arguments:
+#   {bootstrap,default,gem,ruby,run,sudo,test,update}
+#                         command to run
+#
+# optional arguments:
+#   -h, --help            show this help message and exit
+#   -c CMD, --command CMD
+#                         command to run
+#   -d DNA_PATTERNS [DNA_PATTERNS ...], --dna_patterns DNA_PATTERNS [DNA_PATTERNS ...]
+#                         space-separated list of patterns to match against dna
+#                         file names
+#   -k KEY_FILENAME, --key_filename KEY_FILENAME
+#                         full path to key filename (pem key)
+#   -l {debug,info,warn,error,fatal}, --loglevel {debug,info,warn,error,fatal}
+#                         The chef log level to use
+#   -p [PROVIDERS [PROVIDERS ...]], --providers [PROVIDERS [PROVIDERS ...]]
+#                         space-separated list of providers
+#   -r [REGIONS [REGIONS ...]], --regions [REGIONS [REGIONS ...]]
+#                         space-separated list of regions
+#   -s [SERVICES [SERVICES ...]], --services [SERVICES [SERVICES ...]]
+#                         space-separated list of services
+#   -u USER, --user USER  user to run commands as
+#   -v, --version         Print version and exit
+#
+# Chef Solo Cup is pwnage
+#

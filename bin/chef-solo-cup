@@ -1,222 +1,59 @@
 #!/usr/bin/env python
-#
-# usage: chef-solo-cup [-h] [-c CMD] [-d DNA_PATTERNS [DNA_PATTERNS ...]]
-#                      [-k KEY_FILENAME] [-l {debug,info,warn,error,fatal}]
-#                      [-p [PROVIDERS [PROVIDERS ...]]]
-#                      [-r [REGIONS [REGIONS ...]]]
-#                      [-s [SERVICES [SERVICES ...]]] [-u USER] [-v]
-#                      {bootstrap,default,gem,ruby,run,sudo,test,update}
-#
-# Chef-solo-cup, a chef-solo wrapper
-#
-# positional arguments:
-#   {bootstrap,default,gem,ruby,run,sudo,test,update}
-#                         command to run
-#
-# optional arguments:
-#   -h, --help            show this help message and exit
-#   -c CMD, --command CMD
-#                         command to run
-#   -d DNA_PATTERNS [DNA_PATTERNS ...], --dna_patterns DNA_PATTERNS [DNA_PATTERNS ...]
-#                         space-separated list of patterns to match against dna
-#                         file names
-#   -k KEY_FILENAME, --key_filename KEY_FILENAME
-#                         full path to key filename (pem key)
-#   -l {debug,info,warn,error,fatal}, --loglevel {debug,info,warn,error,fatal}
-#                         The chef log level to use
-#   -p [PROVIDERS [PROVIDERS ...]], --providers [PROVIDERS [PROVIDERS ...]]
-#                         space-separated list of providers
-#   -r [REGIONS [REGIONS ...]], --regions [REGIONS [REGIONS ...]]
-#                         space-separated list of regions
-#   -s [SERVICES [SERVICES ...]], --services [SERVICES [SERVICES ...]]
-#                         space-separated list of services
-#   -u USER, --user USER  user to run commands as
-#   -v, --version         Print version and exit
-#
-# Chef Solo Cup is pwnage
-#
-
 
 from __future__ import with_statement
 
-from fabric.api import *
-from fabric.contrib.project import rsync_project
-
-import argparse
+from fabric.api import env
 import os
 
-__DIRECTORY__ = os.path.dirname(os.path.realpath(__file__))
-__DNA_DIRECTORY__ = os.path.join(__DIRECTORY__, 'dna')
+from chef_solo_cup import helpers
+from chef_solo_cup.log import setup_custom_logger
+from chef_solo_cup.parse_args import parse_args
+from chef_solo_cup.version import version
+from chef_solo_cup.commands.bootstrap import bootstrap
+from chef_solo_cup.commands.default import default
+from chef_solo_cup.commands.gem import gem
+from chef_solo_cup.commands.ruby import ruby
+from chef_solo_cup.commands.runner import run_command, sudo_command
+from chef_solo_cup.commands.test import test
+from chef_solo_cup.commands.update import update
 
 AWS_KEY = os.environ.get('AWS_KEY', None)
 AWS_SECRET_KEY = os.environ.get('AWS_SECRET_KEY', None)
 
-OHAI_VERSION = os.environ.get('OHAI_VERSION', '6.14.0')
-CHEF_VERSION = os.environ.get('CHEF_VERSION', '10.14.4')
-CHEF_FILE_DEST = os.environ.get('CHEF_FILE_DEST', '/tmp/chef')
 
+args = parse_args()
+version(args)
 
-def _get_hosts(args=None):
-    if args.dna_patterns is None:
-        raise Exception("Missing DNA files")
+logger = setup_custom_logger('chef-solo-cup', args)
+hosts = helpers.get_hosts(args, logger=logger)
 
-    hosts = {}
+logger.info("Matched hosts: " + str(hosts.keys()))
+for host, config in hosts.iteritems():
+    logger.info("Running {0} against {1}".format(args.command, host))
 
-    for root, sub_folders, files in os.walk(__DNA_DIRECTORY__):
-        files = filter(lambda f: ".json" in f, files)
-        for f in files:
-            path = root.split("/")
-            region = path.pop()
-            provider = path.pop()
-            service = path.pop()
+    env.use_ssh_config = True
+    env.user = args.user
+    env.host = host
+    env.host_string = host
 
-            if args.dna_patterns:
-                skip = True
-                for dna in args.dna_patterns:
-                    if dna in f:
-                        skip = False
+    if args.key_filename:
+        env.key_filename = [args.key_filename, ]
 
-                if skip:
-                    continue
-
-            if args.regions and region not in args.regions:
-                continue
-            if args.providers and provider not in args.providers:
-                continue
-            if args.services and service not in args.services:
-                continue
-
-            host = f.replace(".json", "")
-
-            hosts[host] = {
-                'file': f,
-                'path': os.path.join(root, f),
-                'root': root,
-                'region': region,
-                'provider': provider,
-                'service': service,
-                'dna_path': "{0}/{1}/{2}/{3}".format(service, provider, region, f)
-            }
-
-    return hosts
-
-
-def _install_ruby_19():
-    print "-> Installing Ruby 1.9.2"
-    sudo("apt-get install -y ruby1.9.1 ruby1.9.1-dev rubygems1.9.1 irb1.9.1 ri1.9.1 rdoc1.9.1 libopenssl-ruby1.9.1")
-
-    print "-> Installing Chef ..."
-    gem()
-
-
-def _sync_cookbooks():
-    # sync files
-    with settings(hide('stdout'), warn_only=True):
-        rsync_project(extra_opts="-Caz", delete=True, exclude=".git", local_dir="./", remote_dir=CHEF_FILE_DEST)
-
-    sudo("chmod -R a+w {0}".format(CHEF_FILE_DEST))
-
-
-def hostname():
-    sudo('hostname')
-
-
-def bootstrap():
-    with settings(hide('warnings', 'stdout', 'stderr'), warn_only=True):
-        result = sudo("command -v chef-solo")
-
-    if not result.failed:
-        print "-> Chef already boostrapped."
-        return
-
-    print "-> Installing Prerequisite Packages..."
-    sudo("apt-get update")
-    sudo("apt-get upgrade -y")
-    sudo("apt-get install -y build-essential git-core curl libssl-dev libxslt-dev libxml2-dev libreadline-dev zlib1g-dev")
-    sudo("apt-get install -y binutils-doc gcc autoconf flex bison libtool")
-
-    _install_ruby_19()
-
-
-def ruby():
-    _install_ruby_19()
-
-
-def run_command(args):
-    run(args.cmd)
-
-
-def sudo_command(args):
-    sudo(args.cmd)
-
-
-def default():
-    _sync_cookbooks()
-    sudo("source /etc/profile && `which chef-solo` -c {0}/solo-config.rb -j {0}/dna/{1}.json".format(CHEF_FILE_DEST, "default"))
-
-
-def gem():
-    sudo('gem install -v {0} ohai --no-rdoc --no-ri'.format(OHAI_VERSION))
-    sudo('gem install -v {0} chef --no-rdoc --no-ri'.format(CHEF_VERSION))
-
-
-def update(args, host, config):
-    _sync_cookbooks()
-    sudo("source /etc/profile && `which chef-solo` -c {0}/solo-config.rb -j {0}/dna/{1} -l {2}".format(CHEF_FILE_DEST, config.get('dna_path'), args.loglevel))
-
-
-def version():
-    print "Chef-Solo-Cup 0.0.3"
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Chef-solo-cup, a chef-solo wrapper',
-                                epilog="Chef Solo Cup is pwnage",
-                                formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('command', help='command to run', choices=['bootstrap', 'default', 'gem', 'ruby', 'run', 'sudo', 'test', 'update'])
-    parser.add_argument('-c', '--command', help='command to run', dest='cmd', default=False)
-    parser.add_argument('-d', '--dna_patterns', help='space-separated list of patterns to match against dna file names', dest='dna_patterns', nargs='+')
-    parser.add_argument('-k', '--key_filename', help='full path to key filename (pem key)', default=None, dest='key_filename')
-    parser.add_argument('-l', '--loglevel', help='The chef log level to use', choices=['debug', 'info', 'warn', 'error', 'fatal'], dest='loglevel', default='info')
-    parser.add_argument('-p', '--providers', help='space-separated list of providers', dest='providers', nargs='*')
-    parser.add_argument('-r', '--regions', help='space-separated list of regions', dest='regions', nargs='*')
-    parser.add_argument('-s', '--services', help='space-separated list of services', dest='services', nargs='*')
-    parser.add_argument('-u', '--user', help='user to run commands as', dest='user', default='deploy')
-    parser.add_argument('-v', '--version', help='Print version and exit', dest='version', default=False, action='store_true')
-    parser.set_defaults(dna=os.environ.get("CUP_DNA", ''))
-
-    args = parser.parse_args()
-    if args.version:
-        version()
-        exit(1)
-
-    hosts = _get_hosts(args)
-
-    print "Matched hosts: " + str(hosts.keys())
-    for host, config in hosts.iteritems():
-        print "Running {0} against {1}".format(args.command, host)
-
-        env.use_ssh_config = True
-        env.user = args.user
-        env.host = host
-        env.host_string = host
-
-        if args.key_filename:
-            env.key_filename = [args.key_filename, ]
-
-        if args.command == 'bootstrap':
-            env.abort_on_prompts = True
-            bootstrap()
-            update(args, host, config)
-        if args.command == 'gem':
-            gem()
-        if args.command == 'ruby':
-            ruby()
-        if args.command == 'run':
-            run_command(args)
-        if args.command == 'sudo':
-            sudo_command(args)
-        if args.command == 'test':
-            test()
-        if args.command == 'update':
-            update(args, host, config)
+    if args.command == 'bootstrap':
+        env.abort_on_prompts = True
+        bootstrap(args, config, logger=logger)
+        update(args, config, logger=logger)
+    if args.command == 'default':
+        default(args, config, logger=logger)
+    if args.command == 'gem':
+        gem(args, config, logger=logger)
+    if args.command == 'ruby':
+        ruby(args, config, logger=logger)
+    if args.command == 'run':
+        run_command(args, config, logger=logger)
+    if args.command == 'sudo':
+        sudo_command(args, config, logger=logger)
+    if args.command == 'test':
+        test(args, config, logger=logger)
+    if args.command == 'update':
+        update(args, config, logger=logger)
