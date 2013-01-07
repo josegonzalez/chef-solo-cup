@@ -15,6 +15,7 @@ from chef_solo_cup.commands.default import default
 from chef_solo_cup.commands.gem import gem
 from chef_solo_cup.commands.ruby import ruby
 from chef_solo_cup.commands.runner import run_command, sudo_command
+from chef_solo_cup.commands.sync import sync
 from chef_solo_cup.commands.test import test
 from chef_solo_cup.commands.update import update
 
@@ -35,6 +36,7 @@ commands = {
     'ruby': ruby,
     'run': run_command,
     'sudo': sudo_command,
+    'sync': sync,
     'test': test,
     'update': update,
 }

@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-from fabric.api import hide, run, settings, sudo
+from fabric.api import run, sudo
 from fabric.contrib.project import rsync_project
 from chef_solo_cup.log import setup_custom_logger
 import os
@@ -53,6 +53,16 @@ def get_hosts(args, logger=None):
     return hosts
 
 
+def rsync_project_dry(args, logger=None, **kwargs):
+    if logger is None:
+        logger = setup_custom_logger('chef-solo-cup', args)
+
+    if args.dry_run:
+        logger.info("[RSYNC_PROJECT] {0}".format(**kwargs))
+    else:
+        rsync_project(**kwargs)
+
+
 def run_dry(cmd, args, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
@@ -73,8 +83,12 @@ def sudo_dry(cmd, args, logger=None):
         sudo(cmd)
 
 
-def sync_cookbooks(args, config, logger=None):
-    with settings(hide('stdout'), warn_only=True):
-        rsync_project(extra_opts="-Caz", delete=True, exclude=".git", local_dir="./", remote_dir=args.chef_file_dest)
+def add_line_if_not_present_dry(args, filename, line, run_f=run, logger=None):
+    if logger is None:
+        logger = setup_custom_logger('chef-solo-cup', args)
 
-    sudo("chmod -R a+w {0}".format(args.chef_file_dest))
+    cmd = "grep -q -e '%s' %s || echo '%s' >> %s" % (line, filename, line, filename)
+    if args.dry_run:
+        logger.info("[SUDO] {0}".format(cmd))
+    else:
+        run_f(cmd)
