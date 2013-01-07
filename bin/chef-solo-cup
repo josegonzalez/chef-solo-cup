@@ -27,6 +27,17 @@ version(args)
 logger = setup_custom_logger('chef-solo-cup', args)
 hosts = helpers.get_hosts(args, logger=logger)
 
+commands = {
+    'default': default,
+    'gem': gem,
+    'ruby': ruby,
+    'run': run_command,
+    'sudo': sudo_command,
+    'test': test,
+    'update': update,
+}
+
+
 logger.info("Matched hosts: " + str(hosts.keys()))
 for host, config in hosts.iteritems():
     logger.info("Running {0} against {1}".format(args.command, host))
@@ -43,17 +54,5 @@ for host, config in hosts.iteritems():
         env.abort_on_prompts = True
         bootstrap(args, config, logger=logger)
         update(args, config, logger=logger)
-    if args.command == 'default':
-        default(args, config, logger=logger)
-    if args.command == 'gem':
-        gem(args, config, logger=logger)
-    if args.command == 'ruby':
-        ruby(args, config, logger=logger)
-    if args.command == 'run':
-        run_command(args, config, logger=logger)
-    if args.command == 'sudo':
-        sudo_command(args, config, logger=logger)
-    if args.command == 'test':
-        test(args, config, logger=logger)
-    if args.command == 'update':
-        update(args, config, logger=logger)
+    elif args.command in commands:
+        commands[args.command](args, config, logger=logger)
