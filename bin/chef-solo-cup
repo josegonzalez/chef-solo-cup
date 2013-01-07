@@ -10,6 +10,7 @@ from chef_solo_cup.log import setup_custom_logger
 from chef_solo_cup.parse_args import parse_args
 from chef_solo_cup.version import version
 from chef_solo_cup.commands.bootstrap import bootstrap
+from chef_solo_cup.commands.clean import clean
 from chef_solo_cup.commands.default import default
 from chef_solo_cup.commands.gem import gem
 from chef_solo_cup.commands.ruby import ruby
@@ -29,6 +30,7 @@ hosts = helpers.get_hosts(args, logger=logger)
 
 commands = {
     'default': default,
+    'clean': clean,
     'gem': gem,
     'ruby': ruby,
     'run': run_command,
