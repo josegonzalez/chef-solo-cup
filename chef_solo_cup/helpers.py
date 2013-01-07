@@ -6,26 +6,6 @@ from chef_solo_cup.log import setup_custom_logger
 import os
 
 
-def sudo_dry(cmd, args, logger=None):
-    if logger is None:
-        logger = setup_custom_logger('chef-solo-cup', args)
-
-    if args.dry_run:
-        logger.info("[SUDO] {0}".format(cmd))
-    else:
-        sudo(cmd)
-
-
-def run_dry(cmd, args, logger=None):
-    if logger is None:
-        logger = setup_custom_logger('chef-solo-cup', args)
-
-    if args.dry_run:
-        logger.info("[RUN] {0}".format(cmd))
-    else:
-        run(cmd)
-
-
 def get_hosts(args, logger=None):
     dna_path = os.path.join(os.path.realpath(os.getcwd()), 'dna')
 
@@ -71,6 +51,26 @@ def get_hosts(args, logger=None):
             }
 
     return hosts
+
+
+def run_dry(cmd, args, logger=None):
+    if logger is None:
+        logger = setup_custom_logger('chef-solo-cup', args)
+
+    if args.dry_run:
+        logger.info("[RUN] {0}".format(cmd))
+    else:
+        run(cmd)
+
+
+def sudo_dry(cmd, args, logger=None):
+    if logger is None:
+        logger = setup_custom_logger('chef-solo-cup', args)
+
+    if args.dry_run:
+        logger.info("[SUDO] {0}".format(cmd))
+    else:
+        sudo(cmd)
 
 
 def sync_cookbooks(args, config, logger=None):
