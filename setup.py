@@ -1,13 +1,16 @@
 #!/usr/bin/env python
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
-from distutils.core import setup
 
 setup(
     name='chef-solo-cup',
-    version='0.0.1',
+    version='0.0.2',
     author='Jose Diaz-Gonzalez',
     author_email='email@josediazgonzalez.com',
-    packages=['chef_solo_cup'],
+    packages=['chef_solo_cup', 'chef_solo_cup.commands'],
     scripts=['bin/chef-solo-cup'],
     url='https://github.com/josegonzalez/chef-solo-cup',
     license=open('LICENSE.txt').read(),
