@@ -12,7 +12,7 @@ def bootstrap(args, config, logger=None):
         logger = setup_custom_logger('chef-solo-cup', args)
 
     with settings(hide('warnings', 'stdout', 'stderr'), warn_only=True):
-        result = sudo_dry("command -v chef-solo")
+        result = sudo_dry("command -v chef-solo", args, logger=logger)
 
     if not result.failed:
         logger.info("-> Chef already boostrapped.")
