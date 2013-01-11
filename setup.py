@@ -7,7 +7,7 @@ except ImportError:
 
 setup(
     name='chef-solo-cup',
-    version='0.0.2',
+    version='0.0.3',
     author='Jose Diaz-Gonzalez',
     author_email='email@josediazgonzalez.com',
     packages=['chef_solo_cup', 'chef_solo_cup.commands'],
