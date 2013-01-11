@@ -70,7 +70,7 @@ def run_dry(cmd, args, logger=None):
     if args.dry_run:
         logger.info("[RUN] {0}".format(cmd))
     else:
-        run(cmd)
+        return run(cmd)
 
 
 def sudo_dry(cmd, args, logger=None):
@@ -80,7 +80,7 @@ def sudo_dry(cmd, args, logger=None):
     if args.dry_run:
         logger.info("[SUDO] {0}".format(cmd))
     else:
-        sudo(cmd)
+        return sudo(cmd)
 
 
 def add_line_if_not_present_dry(args, filename, line, run_f=run, logger=None):
