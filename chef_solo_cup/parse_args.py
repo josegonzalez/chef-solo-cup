@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument('-v', '--version', help='Print version and exit', dest='version', default=False, action='store_true')
 
     parser.add_argument('--dry_run', help='perform a dry run of all commands', dest='dry_run', default=False, action='store_true')
-    parser.add_argument('--chef_version', help='chef version to install', dest='chef_version', default='10.14.4')
+    parser.add_argument('--chef_version', help='chef version to install', dest='chef_version', default='10.16.4')
     parser.add_argument('--ohai_version', help='ohai version to install', dest='ohai_version', default='6.14.0')
     parser.add_argument('--chef_file_dest', help='chef file destination on disk', dest='chef_file_dest', default='/tmp/chef')
 
