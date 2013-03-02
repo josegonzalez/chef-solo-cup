@@ -42,6 +42,8 @@ commands = {
     'update': update,
 }
 
+if args.dry_run:
+    logger.info("Running in dry-run mode, commands will not be executed")
 
 logger.info("Matched hosts: " + str(hosts.keys()))
 
