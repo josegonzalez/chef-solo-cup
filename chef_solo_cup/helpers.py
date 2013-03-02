@@ -1,15 +1,22 @@
 from __future__ import with_statement
 
+import os
+import re
+
 from fabric.api import run, sudo
 from fabric.contrib.project import rsync_project
+
 from chef_solo_cup.log import setup_custom_logger
-import os
 
 
 def get_hosts(args, logger=None):
     dna_path = os.path.join(os.path.realpath(os.getcwd()), 'dna')
 
     hosts = {}
+
+    includes = []
+    if args.dna_patterns:
+        includes = map(lambda x: re.compile(x), args.dna_patterns)
 
     for root, sub_folders, files in os.walk(dna_path):
         files = filter(lambda f: ".json" in f, files)
@@ -19,13 +26,13 @@ def get_hosts(args, logger=None):
             provider = path.pop()
             service = path.pop()
 
-            if args.dna_patterns:
-                skip = True
-                for dna in args.dna_patterns:
-                    if dna in f:
-                        skip = False
-
                 if skip:
+                    continue
+
+            if len(includes):
+                skip = map(lambda regex: regex.search(f), includes)
+                skip = reduce(lambda x, y: x or y, skip)
+                if skip is None:
                     continue
 
             if args.regions and region not in args.regions:
