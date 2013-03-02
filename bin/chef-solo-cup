@@ -3,6 +3,7 @@
 from __future__ import with_statement
 
 from fabric.api import env
+from fabric.exceptions import NetworkError
 import os
 import sys
 
@@ -66,9 +67,12 @@ for host, config in hosts.iteritems():
     if args.key_filename:
         env.key_filename = [args.key_filename, ]
 
-    if args.command == 'bootstrap':
-        env.abort_on_prompts = True
-        bootstrap(args, config, logger=logger)
-        update(args, config, logger=logger)
-    elif args.command in commands:
-        commands[args.command](args, config, logger=logger)
+    try:
+        if args.command == 'bootstrap':
+            env.abort_on_prompts = True
+            bootstrap(args, config, logger=logger)
+            update(args, config, logger=logger)
+        elif args.command in commands:
+            commands[args.command](args, config, logger=logger)
+    except NetworkError as e:
+        logger.exception("There was a network error: {0}".format(e.message))
