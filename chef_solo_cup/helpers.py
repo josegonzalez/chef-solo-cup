@@ -18,6 +18,10 @@ def get_hosts(args, logger=None):
     if args.dna_patterns:
         includes = map(lambda x: re.compile(x), args.dna_patterns)
 
+    excludes = []
+    if args.exclude:
+        excludes = map(lambda x: re.compile(x), args.exclude)
+
     for root, sub_folders, files in os.walk(dna_path):
         files = filter(lambda f: ".json" in f, files)
         for f in files:
@@ -26,6 +30,9 @@ def get_hosts(args, logger=None):
             provider = path.pop()
             service = path.pop()
 
+            if len(excludes):
+                skip = map(lambda regex: regex.search(f), excludes)
+                skip = reduce(lambda x, y: x or y, skip)
                 if skip:
                     continue
 

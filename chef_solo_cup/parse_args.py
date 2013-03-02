@@ -9,6 +9,7 @@ def parse_args():
     parser.add_argument('-c', '--command', help='command to run', dest='cmd', default=False)
     parser.add_argument('-d', '--dna-patterns', help='space-separated list of patterns to match against dna file names', default=None, dest='dna_patterns', nargs='+')
     parser.add_argument('-D', '--debug', help='enable debug mode', dest='debug', default=False, action='store_true')
+    parser.add_argument('-e', '--exclude', help='A regex to exclude hosts by', default=None, dest='exclude', nargs='+')
     parser.add_argument('-i', '--ip-address', help='The ip address to connect to', dest='ip_address', default=None)
     parser.add_argument('-k', '--key-filename', help='full path to key filename (pem key)', default=None, dest='key_filename')
     parser.add_argument('-l', '--loglevel', help='The chef log level to use', choices=['debug', 'info', 'warn', 'error', 'fatal'], dest='loglevel', default='info')
