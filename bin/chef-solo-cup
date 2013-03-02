@@ -4,6 +4,7 @@ from __future__ import with_statement
 
 from fabric.api import env
 import os
+import sys
 
 from chef_solo_cup import helpers
 from chef_solo_cup.log import setup_custom_logger
@@ -43,13 +44,22 @@ commands = {
 
 
 logger.info("Matched hosts: " + str(hosts.keys()))
+
+if args.ip_address and len(hosts.keys()) > 1:
+    sys.exit("You cannot specify --ip-address with more than 1 matching host")
+
 for host, config in hosts.iteritems():
     logger.info("Running {0} against {1}".format(args.command, host))
 
     env.use_ssh_config = True
     env.user = args.user
-    env.host = host
-    env.host_string = host
+
+    if args.ip_address:
+        env.host = args.ip_address
+        env.host_string = args.ip_address
+    else:
+        env.host = host
+        env.host_string = host
 
     if args.key_filename:
         env.key_filename = [args.key_filename, ]
