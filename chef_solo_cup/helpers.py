@@ -72,7 +72,7 @@ def rsync_project_dry(args, logger=None, **kwargs):
         logger = setup_custom_logger('chef-solo-cup', args)
 
     if args.dry_run:
-        logger.info("[RSYNC_PROJECT] {0}".format(**kwargs))
+        logger.info("[RSYNC_PROJECT] From {0} to {1} with opts='{2}' excluding='{3}'".format(kwargs.get('local_dir'), kwargs.get('remote_dir'), kwargs.get('extra_opts'), kwargs.get('exclude')))
     else:
         rsync_project(**kwargs)
 
