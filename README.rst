@@ -4,55 +4,79 @@ chef-solo-cup
 
 Chef Solo Cup is a wrapper around chef-solo, for booting/updating AWS instances
 
-
 Installation
 ============
 
-::
-    pip install chef-solo-cup
+Using PIP:
 
+From Github::
+
+    pip install git+git://github.com/josegonzalez/chef-solo-cup.git#egg=beaver
+
+From PyPI::
+
+    pip install chef-solo-cup
 
 Usage
 =====
 
-::
-    usage: chef-solo-cup [-h] [-c CMD] [-d DNA_PATTERNS [DNA_PATTERNS ...]]
-                         [-k KEY_FILENAME] [-l {debug,info,warn,error,fatal}]
-                         [-p [PROVIDERS [PROVIDERS ...]]]
-                         [-r [REGIONS [REGIONS ...]]]
-                         [-s [SERVICES [SERVICES ...]]] [-u USER] [-v]
-                         {bootstrap,default,gem,ruby,run,sudo,test,update}
+CLI Usage is as follows::
+
+    chef-solo-cup [-h] [-c CMD] [-d DNA_PATTERNS [DNA_PATTERNS ...]] [-D]
+                  [-e EXCLUDE [EXCLUDE ...]] [-i IP_ADDRESS]
+                  [-k KEY_FILENAME] [-l {debug,info,warn,error,fatal}]
+                  [-o OUTPUT] [-p [PROVIDERS [PROVIDERS ...]]]
+                  [-r [REGIONS [REGIONS ...]]] [-R REPOSITORY]
+                  [-s [SERVICES [SERVICES ...]]] [-S {git,rsync}] [-u USER]
+                  [-v] [--dry-run] [--chef-version CHEF_VERSION]
+                  [--ohai-version OHAI_VERSION]
+                  [--chef-file-dest CHEF_FILE_DEST]
+
+                  {bootstrap,clean,default,gem,ruby,run,sync,sudo,test,update}
 
     Chef-solo-cup, a chef-solo wrapper
 
     positional arguments:
-      {bootstrap,default,gem,ruby,run,sudo,test,update}
+      {bootstrap,clean,default,gem,ruby,run,sync,sudo,test,update}
                             command to run
 
     optional arguments:
       -h, --help            show this help message and exit
       -c CMD, --command CMD
                             command to run
-      -d DNA_PATTERNS [DNA_PATTERNS ...], --dna_patterns DNA_PATTERNS [DNA_PATTERNS ...]
+      -d DNA_PATTERNS [DNA_PATTERNS ...], --dna-patterns DNA_PATTERNS [DNA_PATTERNS ...]
                             space-separated list of patterns to match against dna
                             file names
-      -k KEY_FILENAME, --key_filename KEY_FILENAME
+      -D, --debug           enable debug mode
+      -e EXCLUDE [EXCLUDE ...], --exclude EXCLUDE [EXCLUDE ...]
+                            A regex to exclude hosts by
+      -i IP_ADDRESS, --ip-address IP_ADDRESS
+                            The ip address to connect to
+      -k KEY_FILENAME, --key-filename KEY_FILENAME
                             full path to key filename (pem key)
       -l {debug,info,warn,error,fatal}, --loglevel {debug,info,warn,error,fatal}
                             The chef log level to use
+      -o OUTPUT, --output OUTPUT
+                            file to pipe output to (in addition to stdout)
       -p [PROVIDERS [PROVIDERS ...]], --providers [PROVIDERS [PROVIDERS ...]]
                             space-separated list of providers
       -r [REGIONS [REGIONS ...]], --regions [REGIONS [REGIONS ...]]
                             space-separated list of regions
+      -R REPOSITORY, --repository REPOSITORY
+                            repository to use when cloning instead of using rsync
       -s [SERVICES [SERVICES ...]], --services [SERVICES [SERVICES ...]]
                             space-separated list of services
+      -S {git,rsync}, --sync {git,rsync}
+                            method to sync chef with
       -u USER, --user USER  user to run commands as
       -v, --version         Print version and exit
-
-    Chef Solo Cup is pwnage
-
-
-
+      --dry-run             perform a dry run of all commands
+      --chef-version CHEF_VERSION
+                            chef version to install
+      --ohai-version OHAI_VERSION
+                            ohai version to install
+      --chef-file-dest CHEF_FILE_DEST
+                            chef file destination on disk
 
 ========
 UPCOMING
