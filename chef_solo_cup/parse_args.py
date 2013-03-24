@@ -27,9 +27,8 @@ def parse_args():
     }
 
     try:
-        config_path = os.environ.get('CUP_CONFIG_PATH', os.path.realpath(os.getcwd()), 'chef-solo-cup.json')
-        config_file = os.path.join(config_path)
-        with open(config_file) as f:
+        config_path = os.environ.get('CUP_CONFIG_PATH', os.path.join(os.path.realpath(os.getcwd()), 'chef-solo-cup.json'))
+        with open(config_path) as f:
             config = json.loads(f.read())
     except IOError:
         config = {}
