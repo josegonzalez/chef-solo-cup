@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+from chef_solo_cup import __version__
+
 try:
     from setuptools import setup
 except ImportError:
@@ -7,7 +10,7 @@ except ImportError:
 
 setup(
     name='chef-solo-cup',
-    version='0.0.6',
+    version=__version__,
     author='Jose Diaz-Gonzalez',
     author_email='email@josediazgonzalez.com',
     packages=['chef_solo_cup', 'chef_solo_cup.commands'],
