@@ -10,4 +10,5 @@ def default(args, config, logger=None):
         logger = setup_custom_logger('chef-solo-cup', args)
 
     sync(args, config, logger=logger)
-    sudo_dry("source /etc/profile && `which chef-solo` -c {0}/solo-config.rb -j {0}/dna/{1} -l {2}".format(args.chef_file_dest, "default.json", args.loglevel), args, logger=logger)
+    command = "cd {0} && source /etc/profile && `which chef-solo` -c {0}/{1} -j {0}/dna/{2} -l {3}"
+    sudo_dry(command.format(args.chef_file_dest, args.config_path, "default.json", args.loglevel), args, logger=logger)
