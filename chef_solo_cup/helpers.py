@@ -2,6 +2,7 @@ from __future__ import with_statement
 
 import os
 import re
+import sys
 
 from fabric.api import run, sudo
 from fabric.contrib.project import rsync_project
@@ -74,7 +75,10 @@ def rsync_project_dry(args, logger=None, **kwargs):
     if args.dry_run:
         logger.info("[RSYNC_PROJECT] From {0} to {1} with opts='{2}' excluding='{3}'".format(kwargs.get('local_dir'), kwargs.get('remote_dir'), kwargs.get('extra_opts'), kwargs.get('exclude')))
     else:
-        rsync_project(**kwargs)
+        out = rsync_project(**kwargs)
+        if out.return_code != 0:
+            logger.info("[RSYNC_PROJECT] Failed command with status code {0}, please run `chef-solo-cup clean` against this node".format(out.return_code))
+            sys.exit(0)
 
 
 def run_dry(cmd, args, logger=None):
