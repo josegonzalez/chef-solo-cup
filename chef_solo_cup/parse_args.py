@@ -26,12 +26,21 @@ def parse_args():
         "chef-file-dest": "/tmp/chef",
     }
 
-    try:
-        config_path = os.environ.get('CUP_CONFIG_PATH', os.path.join(os.path.realpath(os.getcwd()), 'chef-solo-cup.json'))
-        with open(config_path) as f:
-            config = json.loads(f.read())
-    except IOError:
-        config = {}
+    paths = [
+        os.path.join(os.path.realpath(os.getcwd()), 'chef-solo-cup.json'),
+        os.path.join(os.path.realpath(os.getcwd()), '.chef', 'chef-solo-cup.json'),
+        os.path.join(os.path.realpath(os.getcwd()), '.chef', 'user-chef-solo-cup.json')
+    ]
+
+    config = {}
+    for path in paths:
+        try:
+            with open(path) as f:
+                data = json.loads(f.read())
+                config = dict(config.items() + data.items())
+                break
+        except IOError:
+            pass
 
     options = dict(defaults.items() + config.items())
 
