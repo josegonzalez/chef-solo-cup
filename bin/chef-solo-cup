@@ -46,12 +46,13 @@ commands = {
 if args.dry_run:
     logger.info("Running in dry-run mode, commands will not be executed")
 
-logger.info("Matched hosts: " + str(hosts.keys()))
+logger.info("Matched hosts: " + str(sorted(hosts.keys())))
 
 if args.ip_address and len(hosts.keys()) > 1:
     sys.exit("You cannot specify --ip-address with more than 1 matching host")
 
-for host, config in hosts.iteritems():
+for host in sorted(hosts.keys()):
+    config = hosts[host]
     logger.info("Running {0} against {1}".format(args.command, host))
 
     env.use_ssh_config = True
