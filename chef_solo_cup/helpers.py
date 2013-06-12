@@ -4,10 +4,10 @@ import os
 import re
 import sys
 
+from boto.ec2 import connect_to_region
 from boto.ec2.autoscale import AutoScaleConnection
 from fabric.api import run, sudo
 from fabric.contrib.project import rsync_project
-import boto.ec2
 
 from chef_solo_cup.log import setup_custom_logger
 
@@ -74,7 +74,7 @@ def get_asg_hosts(args, dna_path):
     hosts = {}
     for region in args.regions:
         auto_scale_conn = AutoScaleConnection(args.aws_access_key_id, args.aws_secret_access_key)
-        conn = boto.ec2.connect_to_region(
+        conn = connect_to_region(
             region,
             aws_access_key_id=args.aws_access_key_id,
             aws_secret_access_key=args.aws_secret_access_key,
