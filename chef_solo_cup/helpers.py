@@ -70,8 +70,13 @@ def get_hosts(args, logger=None):
     hosts.update(get_asg_hosts(args, dna_path))
     return hosts
 
+
 def get_asg_hosts(args, dna_path):
     hosts = {}
+
+    if not args.regions:
+        return hosts
+
     for region in args.regions:
         auto_scale_conn = AutoScaleConnection(args.aws_access_key_id, args.aws_secret_access_key)
         conn = connect_to_region(
