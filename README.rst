@@ -77,6 +77,10 @@ CLI Usage is as follows::
                             ohai version to install
       --chef-file-dest CHEF_FILE_DEST
                             chef file destination on disk
+      --aws-access-key-id AWS_ACCESS_KEY_ID
+                            AWS Access Key
+      --aws-secret-access-key AWS_SECRET_ACCESS_KEY
+                            AWS Secret Key
 
 ========
 UPCOMING
@@ -254,6 +258,11 @@ DNS Integration
 ===============
 
 Handle this within a recipe. Tooling to do this will only get it wrong. You can use ``node[:box_name]`` to figure out what the alias should be for the instance.
+
+AWS Integration
+===============
+
+If you specify AWS credentials (hopefully in a file instead on the CLI) and regions, chef-solo-cup can query autoscaling groups to bring more nodes. These currently look in `dna/asg` for the DNA files.
 
 Referencing other nodes
 =======================

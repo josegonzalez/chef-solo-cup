@@ -4,6 +4,8 @@ import os
 import re
 import sys
 
+from boto.ec2 import connect_to_region
+from boto.ec2.autoscale import AutoScaleConnection
 from fabric.api import run, sudo
 from fabric.contrib.project import rsync_project
 
@@ -65,6 +67,30 @@ def get_hosts(args, logger=None):
                 'dna_path': "{0}/{1}/{2}/{3}".format(service, provider, region, f)
             }
 
+    hosts.update(get_asg_hosts(args, dna_path))
+    return hosts
+
+def get_asg_hosts(args, dna_path):
+    hosts = {}
+    for region in args.regions:
+        auto_scale_conn = AutoScaleConnection(args.aws_access_key_id, args.aws_secret_access_key)
+        conn = connect_to_region(
+            region,
+            aws_access_key_id=args.aws_access_key_id,
+            aws_secret_access_key=args.aws_secret_access_key,
+        )
+        for group in auto_scale_conn.get_all_groups():
+            instance_ids = [i.instance_id for i in group.instances]
+            reservations = conn.get_all_instances(instance_ids)
+            instances = [i for r in reservations for i in r.instances]
+            for instance in instances:
+                name = '{0}_{1}'.format(group.name, instance.id)
+                hosts[name] = {
+                    'region': region,
+                    'provider': 'AWS',
+                    'public_ip': instance.ip_address,
+                    'dna_path': os.path.join('asg', group.name)
+                }
     return hosts
 
 
