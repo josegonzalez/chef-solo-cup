@@ -70,4 +70,9 @@ def parse_args():
     parser.add_argument('--ohai-version', help='ohai version to install', default=options['ohai-version'], dest='ohai_version')
     parser.add_argument('--chef-file-dest', help='chef file destination on disk', default=options['chef-file-dest'], dest='chef_file_dest')
 
+    # AWS
+
+    parser.add_argument('--aws-access-key-id', help='AWS Access Key', default=options['aws_access_key_id'], dest='aws_access_key_id')
+    parser.add_argument('--aws-secret-access-key', help='chef file destination on disk', default=options['aws_secret_access_key'], dest='aws_secret_access_key')
+
     return parser.parse_args()
