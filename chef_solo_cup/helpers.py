@@ -84,7 +84,7 @@ def get_asg_hosts(args, dna_path):
             reservations = conn.get_all_instances(instance_ids)
             instances = [i for r in reservations for i in r.instances]
             for instance in instances:
-                name = '{}_{}'.format(group.name, instance.id)
+                name = '{0}_{1}'.format(group.name, instance.id)
                 hosts[name] = {
                     'region': region,
                     'provider': 'AWS',
