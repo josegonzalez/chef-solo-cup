@@ -5,6 +5,8 @@ import os
 
 def parse_args():
     defaults = {
+        "aws_access_key_id": None,
+        "aws_secret_access_key": None,
         "command": False,
         "config-path": "solo-config.rb",
         "dna-patterns": None,
