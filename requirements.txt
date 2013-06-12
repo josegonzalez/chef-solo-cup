@@ -1,2 +1,2 @@
 Fabric>=1.5.1
-boto
+boto==2.9.5
