@@ -75,6 +75,6 @@ def parse_args():
     # AWS
 
     parser.add_argument('--aws-access-key-id', help='AWS Access Key', default=options['aws_access_key_id'], dest='aws_access_key_id')
-    parser.add_argument('--aws-secret-access-key', help='chef file destination on disk', default=options['aws_secret_access_key'], dest='aws_secret_access_key')
+    parser.add_argument('--aws-secret-access-key', help='AWS Secret Key', default=options['aws_secret_access_key'], dest='aws_secret_access_key')
 
     return parser.parse_args()
