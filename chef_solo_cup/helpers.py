@@ -99,7 +99,7 @@ def get_asg_hosts(args, dna_path):
             for instance in instances:
                 name = '{0}_{1}'.format(group.name, instance.id)
                 yield name, {
-                    'file': group.name,
+                    'file': name,
                     'region': region,
                     'provider': 'AWS',
                     'public_ip': instance.ip_address,
