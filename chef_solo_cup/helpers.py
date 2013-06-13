@@ -2,6 +2,7 @@ from __future__ import with_statement
 
 import os
 import re
+import itertools
 import sys
 
 from boto.ec2 import connect_to_region
@@ -25,6 +26,37 @@ def get_hosts(args, logger=None):
     if args.exclude:
         excludes = map(lambda x: re.compile(x), args.exclude)
 
+    all_hosts = itertools.chain(
+        get_filesystem_hosts(args, dna_path),
+        get_asg_hosts(args, dna_path),
+    )
+
+    for host, data in all_hosts:
+        f = data.get('file', '')
+        if len(excludes):
+            skip = map(lambda regex: regex.search(f), excludes)
+            skip = reduce(lambda x, y: x or y, skip)
+            if skip:
+                continue
+
+        if len(includes):
+            skip = map(lambda regex: regex.search(f), includes)
+            skip = reduce(lambda x, y: x or y, skip)
+            if skip is None:
+                continue
+
+        if args.regions and data.get('region') not in args.regions:
+            continue
+        if args.providers and data.get('provider') not in args.providers:
+            continue
+        if args.services and data.get('service') not in args.services:
+            continue
+        hosts[host] = data
+
+    return hosts
+
+
+def get_filesystem_hosts(args, dna_path):
     for root, sub_folders, files in os.walk(dna_path):
         files = filter(lambda f: ".json" in f, files)
         for f in files:
@@ -33,31 +65,12 @@ def get_hosts(args, logger=None):
             provider = path.pop()
             service = path.pop()
 
-            if len(excludes):
-                skip = map(lambda regex: regex.search(f), excludes)
-                skip = reduce(lambda x, y: x or y, skip)
-                if skip:
-                    continue
-
-            if len(includes):
-                skip = map(lambda regex: regex.search(f), includes)
-                skip = reduce(lambda x, y: x or y, skip)
-                if skip is None:
-                    continue
-
-            if args.regions and region not in args.regions:
-                continue
-            if args.providers and provider not in args.providers:
-                continue
-            if args.services and service not in args.services:
-                continue
-
             host = f.replace(".json", "")
 
             if host in ["all", "default"]:
                 continue
 
-            hosts[host] = {
+            yield host, {
                 'file': f,
                 'path': os.path.join(root, f),
                 'root': root,
@@ -67,15 +80,10 @@ def get_hosts(args, logger=None):
                 'dna_path': "{0}/{1}/{2}/{3}".format(service, provider, region, f)
             }
 
-    hosts.update(get_asg_hosts(args, dna_path))
-    return hosts
-
 
 def get_asg_hosts(args, dna_path):
-    hosts = {}
-
     if not args.regions:
-        return hosts
+        return
 
     for region in args.regions:
         auto_scale_conn = AutoScaleConnection(args.aws_access_key_id, args.aws_secret_access_key)
@@ -90,13 +98,13 @@ def get_asg_hosts(args, dna_path):
             instances = [i for r in reservations for i in r.instances]
             for instance in instances:
                 name = '{0}_{1}'.format(group.name, instance.id)
-                hosts[name] = {
+                yield name, {
+                    'file': group.name,
                     'region': region,
                     'provider': 'AWS',
                     'public_ip': instance.ip_address,
-                    'dna_path': os.path.join('asg', group.name)
+                    'dna_path': os.path.join('asg', group.name),
                 }
-    return hosts
 
 
 def rsync_project_dry(args, logger=None, **kwargs):
