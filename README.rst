@@ -22,17 +22,20 @@ Usage
 
 CLI Usage is as follows::
 
-    chef-solo-cup [-h] [-c CMD] [-d DNA_PATTERNS [DNA_PATTERNS ...]] [-D]
-                  [-e EXCLUDE [EXCLUDE ...]] [-i IP_ADDRESS]
-                  [-k KEY_FILENAME] [-l {debug,info,warn,error,fatal}]
-                  [-o OUTPUT] [-p [PROVIDERS [PROVIDERS ...]]]
-                  [-r [REGIONS [REGIONS ...]]] [-R REPOSITORY]
-                  [-s [SERVICES [SERVICES ...]]] [-S {git,rsync}] [-u USER]
-                  [-v] [--dry-run] [--chef-version CHEF_VERSION]
-                  [--ohai-version OHAI_VERSION]
-                  [--chef-file-dest CHEF_FILE_DEST]
+    chef-solo-cup [-h] [-c CMD] [-C CONFIG_PATH]
+                     [-d DNA_PATTERNS [DNA_PATTERNS ...]] [-D]
+                     [-e EXCLUDE [EXCLUDE ...]] [-i IP_ADDRESS]
+                     [-k KEY_FILENAME] [-l {debug,info,warn,error,fatal}]
+                     [-o OUTPUT] [-p [PROVIDERS [PROVIDERS ...]]]
+                     [-r [REGIONS [REGIONS ...]]] [-R REPOSITORY]
+                     [-s [SERVICES [SERVICES ...]]] [-S {git,rsync}] [-u USER]
+                     [-v] [--dry-run] [--chef-version CHEF_VERSION]
+                     [--ohai-version OHAI_VERSION]
+                     [--chef-file-dest CHEF_FILE_DEST]
+                     [--aws-access-key-id AWS_ACCESS_KEY_ID]
+                     [--aws-secret-access-key AWS_SECRET_ACCESS_KEY]
 
-                  {bootstrap,clean,default,gem,ruby,run,sync,sudo,test,update}
+                     [{bootstrap,clean,default,gem,ruby,run,sync,sudo,test,update}]
 
     Chef-solo-cup, a chef-solo wrapper
 
@@ -44,6 +47,9 @@ CLI Usage is as follows::
       -h, --help            show this help message and exit
       -c CMD, --command CMD
                             command to run
+      -C CONFIG_PATH, --config-path CONFIG_PATH
+                            relative path from chef file destination to solo
+                            config file
       -d DNA_PATTERNS [DNA_PATTERNS ...], --dna-patterns DNA_PATTERNS [DNA_PATTERNS ...]
                             space-separated list of patterns to match against dna
                             file names
@@ -81,6 +87,7 @@ CLI Usage is as follows::
                             AWS Access Key
       --aws-secret-access-key AWS_SECRET_ACCESS_KEY
                             AWS Secret Key
+
 
 ========
 UPCOMING
