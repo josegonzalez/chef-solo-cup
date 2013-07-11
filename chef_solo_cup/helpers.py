@@ -98,6 +98,8 @@ def get_asg_hosts(args, dna_path):
         )
         for group in auto_scale_conn.get_all_groups():
             instance_ids = [i.instance_id for i in group.instances]
+            if not instance_ids:
+                continue
             try:
                 reservations = conn.get_all_instances(instance_ids)
             except EC2ResponseError:
