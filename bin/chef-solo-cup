@@ -73,7 +73,6 @@ for host in sorted(hosts.keys()):
             env.abort_on_prompts = True
             bootstrap(args, config, logger=logger)
             update(args, config, logger=logger)
-            clean(args, config, logger=logger)
         elif args.command in commands:
             commands[args.command](args, config, logger=logger)
     except NetworkError as e:
