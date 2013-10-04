@@ -7,7 +7,7 @@ import sys
 
 from boto.ec2 import connect_to_region
 from boto.exception import EC2ResponseError
-from boto.ec2.autoscale import AutoScaleConnection
+import boto.ec2.autoscale
 from fabric.api import run, sudo
 from fabric.contrib.project import rsync_project
 
@@ -90,7 +90,11 @@ def get_asg_hosts(args, dna_path):
         return
 
     for region in args.regions:
-        auto_scale_conn = AutoScaleConnection(args.aws_access_key_id, args.aws_secret_access_key)
+        auto_scale_conn = boto.ec2.autoscale.connect_to_region(
+            region,
+            aws_access_key_id=args.aws_access_key_id,
+            aws_secret_access_key=args.aws_secret_access_key,
+        )
         conn = connect_to_region(
             region,
             aws_access_key_id=args.aws_access_key_id,
