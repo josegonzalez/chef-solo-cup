@@ -1,5 +1,6 @@
 from __future__ import with_statement
 
+import collections
 import os
 import re
 import itertools
@@ -53,6 +54,16 @@ def get_hosts(args, logger=None):
         if args.services and data.get('service') not in args.services:
             continue
         hosts[host] = data
+
+    hosts = collections.OrderedDict(sorted(hosts.items()))
+
+    if args.quantity is not None:
+        x = itertools.islice(hosts.items(), 0, int(args.quantity))
+        hosts = {}
+        for key, value in x:
+            hosts[key] = value
+
+        hosts = collections.OrderedDict(sorted(hosts.items()))
 
     return hosts
 
