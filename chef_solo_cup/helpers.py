@@ -111,14 +111,32 @@ def get_asg_hosts(args, dna_path):
             aws_access_key_id=args.aws_access_key_id,
             aws_secret_access_key=args.aws_secret_access_key,
         )
+
+        asg_path = os.path.join(os.path.realpath(os.getcwd()), 'dna', 'asg')
+        asg_dna_files = [ f for f in os.listdir(asg_path) if os.path.isfile(os.path.join(asg_path, f)) ]
+
         for group in auto_scale_conn.get_all_groups():
             instance_ids = [i.instance_id for i in group.instances]
             if not instance_ids:
                 continue
+
             try:
                 reservations = conn.get_all_instances(instance_ids)
             except EC2ResponseError:
                 continue
+
+            group_dna_file = None
+            for asg_dna_file in asg_dna_files:
+                if asg_dna_file == group.name:
+                    group_dna_file = asg_dna_file
+
+            if not group_dna_file:
+                for asg_dna_file in asg_dna_files:
+                    if group.name.startswith(asg_dna_file):
+                        group_dna_file = asg_dna_file
+
+            if not group_dna_file:
+                group_dna_file = group.name
 
             instances = [i for r in reservations for i in r.instances]
             for instance in instances:
@@ -128,7 +146,7 @@ def get_asg_hosts(args, dna_path):
                     'region': region,
                     'provider': 'AWS',
                     'public_ip': instance.ip_address,
-                    'dna_path': os.path.join('asg', group.name),
+                    'dna_path': os.path.join('asg', group_dna_file),
                 }
 
 
