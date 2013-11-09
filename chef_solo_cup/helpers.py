@@ -89,7 +89,7 @@ def get_filesystem_hosts(args, dna_path):
                 'region': region,
                 'provider': provider,
                 'service': service,
-                'dna_path': "{0}/{1}/{2}/{3}".format(service, provider, region, f)
+                'dna_path': "dna/{0}/{1}/{2}/{3}".format(service, provider, region, f)
             }
 
 
@@ -150,7 +150,7 @@ def get_asg_hosts(args, dna_path):
                     'region': region,
                     'provider': 'AWS',
                     'public_ip': instance.ip_address,
-                    'dna_path': os.path.join('asg', group_dna_file),
+                    'dna_path': os.path.join(args.asg_dna_path, group_dna_file),
                 }
 
 

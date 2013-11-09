@@ -11,7 +11,7 @@ def update(args, config, logger=None):
 
     sync(args, config, logger=logger)
 
-    command = "cd {0} && source /etc/profile && `which chef-solo` -c {0}/{1} -j {0}/dna/{2} -l {3}"
+    command = "cd {0} && source /etc/profile && `which chef-solo` -c {0}/{1} -j {0}/{2} -l {3}"
     command += ' && rm -rf {0}'.format(args.chef_file_dest)
 
     sudo_dry(command.format(args.chef_file_dest, args.config_path, config.get('dna_path'), args.loglevel), args, logger=logger)
