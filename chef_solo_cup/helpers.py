@@ -112,7 +112,7 @@ def get_asg_hosts(args, dna_path):
             aws_secret_access_key=args.aws_secret_access_key,
         )
 
-        asg_path = os.path.join(os.path.realpath(os.getcwd()), 'dna', 'asg')
+        asg_path = os.path.join(os.path.realpath(os.getcwd()), args.asg_dna_path)
         asg_dna_files = [ f for f in os.listdir(asg_path) if os.path.isfile(os.path.join(asg_path, f)) ]
 
         for group in auto_scale_conn.get_all_groups():

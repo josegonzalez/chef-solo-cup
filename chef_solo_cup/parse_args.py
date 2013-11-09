@@ -5,6 +5,7 @@ import os
 
 def parse_args():
     defaults = {
+        "asg-dna-path": "dna/asg",
         "aws_access_key_id": None,
         "aws_secret_access_key": None,
         "command": False,
@@ -67,6 +68,7 @@ def parse_args():
                                      epilog="Chef Solo Cup is pwnage",
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('command', help='command to run', choices=['bootstrap', 'clean', 'default', 'gem', 'ruby', 'run', 'sync', 'sudo', 'test', 'update'], nargs='?')
+    parser.add_argument('-a', '--asg-dna-path', help='Path to asg dna files (relative to repo base)', default=options['asg-dna-path'], dest='asg_dna_path')
     parser.add_argument('-c', '--command', help='command to run', default=options['command'], dest='cmd')
     parser.add_argument('-C', '--config-path', help='relative path from chef file destination to solo config file', default=options['config-path'], dest='config_path')
     parser.add_argument('-d', '--dna-patterns', help='space-separated list of patterns to match against dna file names', default=options['dna-patterns'], dest='dna_patterns', nargs='+')
