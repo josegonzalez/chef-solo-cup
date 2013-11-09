@@ -32,16 +32,32 @@ def parse_args():
     paths = [
         os.path.join(os.path.realpath(os.getcwd()), 'chef-solo-cup.json'),
         os.path.join(os.path.realpath(os.getcwd()), '.chef', 'chef-solo-cup.json'),
-        os.path.join(os.path.realpath(os.getcwd()), '.chef', 'user-chef-solo-cup.json')
+        os.path.join(os.path.realpath(os.getcwd()), '.chef', 'config.json'),
+        os.path.join(os.path.realpath(os.getcwd()), '.chef', 'user-config.json'),
     ]
+
+    # Regular expression for comments
+    comment_re = re.compile(
+        '(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
+        re.DOTALL | re.MULTILINE
+    )
+
+    def parse_json(filename):
+        """From: http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html"""
+        with open(filename) as f:
+            content = ''.join(f.readlines())
+            match = comment_re.search(content)
+            while match:
+                content = content[:match.start()] + content[match.end():]
+                match = comment_re.search(content)
+            return json.loads(content)
 
     config = {}
     for path in paths:
         try:
-            with open(path) as f:
-                data = json.loads(f.read())
-                config = dict(config.items() + data.items())
-                break
+            data = parse_json(path)
+            config = dict(config.items() + data.items())
+            break
         except IOError:
             pass
 
