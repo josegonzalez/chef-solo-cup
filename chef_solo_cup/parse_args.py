@@ -7,8 +7,8 @@ import re
 def parse_args():
     defaults = {
         "asg-dna-path": "dna/asg",
-        "aws_access_key_id": None,
-        "aws_secret_access_key": None,
+        "aws-access-key-id": None,
+        "aws-secret-access-key": None,
         "command": False,
         "config-path": "solo-config.rb",
         "dna-patterns": None,
@@ -95,7 +95,7 @@ def parse_args():
 
     # AWS
 
-    parser.add_argument('--aws-access-key-id', help='AWS Access Key', default=options['aws_access_key_id'], dest='aws_access_key_id')
-    parser.add_argument('--aws-secret-access-key', help='AWS Secret Key', default=options['aws_secret_access_key'], dest='aws_secret_access_key')
+    parser.add_argument('--aws-access-key-id', help='AWS Access Key', default=options['aws-access-key-id'], dest='aws_access_key_id')
+    parser.add_argument('--aws-secret-access-key', help='AWS Secret Key', default=options['aws-secret-access-key'], dest='aws_secret_access_key')
 
     return parser.parse_args()
