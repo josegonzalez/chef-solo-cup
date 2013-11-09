@@ -130,6 +130,10 @@ def get_asg_hosts(args, dna_path):
                 if asg_dna_file == group.name:
                     group_dna_file = asg_dna_file
 
+                group_name_json = group.name + ".json"
+                if asg_dna_file == group_name_json:
+                    group_dna_file = asg_dna_file
+
             if not group_dna_file:
                 for asg_dna_file in asg_dna_files:
                     if group.name.startswith(asg_dna_file):
