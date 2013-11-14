@@ -18,6 +18,7 @@ def parse_args():
         "key-filename": None,
         "loglevel": "info",
         "output": None,
+        "parallel": False,
         "providers": None,
         "quantity": None,
         "regions": None,
@@ -79,6 +80,7 @@ def parse_args():
     parser.add_argument('-k', '--key-filename', help='full path to key filename (pem key)', default=options['key-filename'], dest='key_filename')
     parser.add_argument('-l', '--loglevel', help='The chef log level to use', default=options['loglevel'], dest='loglevel', choices=['debug', 'info', 'warn', 'error', 'fatal'])
     parser.add_argument('-o', '--output', help='file to pipe output to (in addition to stdout)', default=options['output'], dest='output')
+    parser.add_argument('-P', '--parallel', help='whether to run commands in parallel', default=options['parallel'], dest='parallel', action='store_true')
     parser.add_argument('-p', '--providers', help='space-separated list of providers', default=options['providers'], dest='providers', nargs='*')
     parser.add_argument('-q', '--quantity', help='The number of nodes to provision', default=options['quantity'], dest='quantity')
     parser.add_argument('-r', '--regions', help='space-separated list of regions', default=options['regions'], dest='regions', nargs='*')
