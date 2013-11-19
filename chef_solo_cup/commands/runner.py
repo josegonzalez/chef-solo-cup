@@ -79,7 +79,7 @@ def run_in_parallel(args, hosts, logger=None):
                    blue=34, magenta=35, cyan=36)
 
     workers = []
-    pool_size = multiprocessing.cpu_count() * 2
+    pool_size = 6  # we don't have more colors than this :P
     for worker_id in range(pool_size):
         color = _colors.pop(random.choice(_colors.keys()), None)
         tmp = multiprocessing.Process(target=_worker,
