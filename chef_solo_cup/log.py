@@ -1,5 +1,5 @@
-import logging
 import argparse
+import logging
 
 
 logging.basicConfig()

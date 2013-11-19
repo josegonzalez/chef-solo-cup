@@ -1,7 +1,10 @@
 from __future__ import with_statement
 
+import argparse
 import collections
+import logging
 import multiprocessing
+import random
 import Queue
 import signal
 import sys
@@ -72,11 +75,15 @@ def run_in_parallel(args, hosts, logger=None):
     for host in hosts.keys():
         task_queue.put({'host': host, 'config': hosts[host]})
 
+    _colors = dict(red=31, green=32, yellow=33,
+                   blue=34, magenta=35, cyan=36)
+
     workers = []
     pool_size = multiprocessing.cpu_count() * 2
     for worker_id in range(pool_size):
+        color = _colors.pop(random.choice(_colors.keys()), None)
         tmp = multiprocessing.Process(target=_worker,
-                                      args=(worker_id, task_queue, result_queue, commands, args, logger))
+                                      args=(worker_id, task_queue, result_queue, commands, color, args, logger))
         tmp.start()
         workers.append(tmp)
 
@@ -90,12 +97,14 @@ def run_in_parallel(args, hosts, logger=None):
             worker.terminate()
             worker.join()
 
-    while not result_queue.empty():
-        pass  # return of each command can be accessed via result_queue.get(block=False)
+    # while not result_queue.empty():
+    #     pass  # return of each command can be accessed via result_queue.get(block=False)
 
 
-def _worker(worker_id, task_queue, result_queue, commands, args, logger):
+def _worker(worker_id, task_queue, result_queue, commands, color, args, logger):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
+    logger = _update_handlers(logger, color, args)
+
     while not task_queue.empty():
         try:
             task = task_queue.get(block=False)
@@ -108,6 +117,24 @@ def _worker(worker_id, task_queue, result_queue, commands, args, logger):
             result_queue.put(response)
         except Queue.Empty:
             pass
+
+def _update_handlers(logger, color, args):
+    has_args = args is not None and type(args) == argparse.Namespace
+    is_debug = has_args and args.debug == True
+
+    logger.handlers = []
+    formatter = logging.Formatter('\x1b[{0};1m[{1}]\x1b[0m [%(asctime)s] %(levelname)-7s %(message)s'.format(color, multiprocessing.current_process().name))
+
+    handler = logging.StreamHandler()
+    if has_args and args.output is not None:
+        handler = logging.FileHandler(output)
+
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    sys.stdout = StreamToLogger(logger, logging.INFO)
+    sys.stderr = StreamToLogger(logger, logging.ERROR)
+    return logger
 
 
 def _run_command(host, config, commands, args, logger):
@@ -137,3 +164,22 @@ def _run_command(host, config, commands, args, logger):
 
     return True
 
+
+class StreamToLogger(object):
+    """
+    Fake file-like stream object that redirects writes to a logger instance.
+    """
+    def __init__(self, logger, log_level=logging.INFO):
+        self.logger = logger
+        self.log_level = log_level
+        self.linebuf = ''
+
+    def write(self, buf):
+        for line in buf.rstrip().splitlines():
+            self.logger.log(self.log_level, line.rstrip())
+
+    def flush(self):
+        pass
+
+    def isatty(self):
+        return True
