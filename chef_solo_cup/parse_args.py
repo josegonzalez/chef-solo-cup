@@ -69,7 +69,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Chef-solo-cup, a chef-solo wrapper',
                                      epilog="Chef Solo Cup is pwnage",
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('command', help='command to run', choices=['bootstrap', 'clean', 'default', 'gem', 'ruby', 'run', 'sync', 'sudo', 'test', 'update'], nargs='?')
+    parser.add_argument('command', help='command to run', choices=['bootstrap', 'clean', 'default', 'gem', 'inspect', 'ruby', 'run', 'sync', 'sudo', 'test', 'update'], nargs='?')
     parser.add_argument('-a', '--asg-dna-path', help='Path to asg dna files (relative to repo base)', default=options['asg-dna-path'], dest='asg_dna_path')
     parser.add_argument('-c', '--command', help='command to run', default=options['command'], dest='cmd')
     parser.add_argument('-C', '--config-path', help='relative path from chef file destination to solo config file', default=options['config-path'], dest='config_path')

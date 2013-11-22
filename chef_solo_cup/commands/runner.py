@@ -19,6 +19,7 @@ from chef_solo_cup.commands.bootstrap import bootstrap
 from chef_solo_cup.commands.clean import clean
 from chef_solo_cup.commands.default import default
 from chef_solo_cup.commands.gem import gem
+from chef_solo_cup.commands.inspect import inspect
 from chef_solo_cup.commands.ruby import ruby
 from chef_solo_cup.commands.sync import sync
 from chef_solo_cup.commands.test import test
@@ -32,6 +33,7 @@ def list_commands():
       'default': default,
       'clean': clean,
       'gem': gem,
+      'inspect': inspect,
       'ruby': ruby,
       'run': run_command,
       'sudo': sudo_command,
