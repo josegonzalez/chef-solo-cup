@@ -129,15 +129,24 @@ def get_asg_hosts(args, dna_path):
             for asg_dna_file in asg_dna_files:
                 if asg_dna_file == group.name:
                     group_dna_file = asg_dna_file
+                    break
 
-                group_name_json = group.name + ".json"
+                group_name_json = group.name + '.json'
                 if asg_dna_file == group_name_json:
                     group_dna_file = asg_dna_file
+                    break
 
             if not group_dna_file:
                 for asg_dna_file in asg_dna_files:
                     if group.name.startswith(asg_dna_file):
                         group_dna_file = asg_dna_file
+                        break
+
+                    stripped_asg_dna_file = asg_dna_file.replace('.json', '')
+                    if group.name.startswith(stripped_asg_dna_file):
+                        group_dna_file = asg_dna_file
+                        break
+
 
             if not group_dna_file:
                 group_dna_file = group.name
