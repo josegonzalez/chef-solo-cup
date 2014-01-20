@@ -101,8 +101,11 @@ def run_in_parallel(args, hosts, logger=None):
             worker.terminate()
             worker.join()
 
-    # while not result_queue.empty():
-    #     pass  # return of each command can be accessed via result_queue.get(block=False)
+    logger.info('Results from run:')
+    while not result_queue.empty():
+        result = result_queue.get()
+        logger.info('{0}: {1}'.format(result['host'], str(result['success'])))
+        # pass  # return of each command can be accessed via result_queue.get(block=False)
 
 
 def _worker(worker_id, task_queue, result_queue, commands, color, args, logger):
@@ -118,7 +121,16 @@ def _worker(worker_id, task_queue, result_queue, commands, color, args, logger):
             ))
 
             response = _run_command(task['host'], task['config'], commands, args, logger)
-            result_queue.put(response)
+
+            success = response
+            if type(success) != bool:
+                success = response.return_code == 0
+
+            result_queue.put({
+                'host': task['host'],
+                'dna_path': task['config']['dna_path'],
+                'success': success,
+            })
         except Queue.Empty:
             pass
 
