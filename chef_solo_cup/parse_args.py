@@ -14,6 +14,7 @@ def parse_args():
         "dna-patterns": None,
         "debug": False,
         "exclude": None,
+        "rsync-exclusions": None,
         "ip-address": None,
         "key-filename": None,
         "loglevel": "info",
@@ -76,6 +77,7 @@ def parse_args():
     parser.add_argument('-d', '--dna-patterns', help='space-separated list of patterns to match against dna file names', default=options['dna-patterns'], dest='dna_patterns', nargs='+')
     parser.add_argument('-D', '--debug', help='enable debug mode', default=options['debug'], dest='debug', action='store_true')
     parser.add_argument('-e', '--exclude', help='A regex to exclude hosts by', default=options['exclude'], dest='exclude', nargs='+')
+    parser.add_argument('-E', '--rsync-exclusions', help='space-separated list of files to exclude in rsync', default=options['rsync-exclusions'], dest='rsync_exclusions', nargs='+')
     parser.add_argument('-i', '--ip-address', help='The ip address to connect to', default=options['ip-address'], dest='ip_address')
     parser.add_argument('-k', '--key-filename', help='full path to key filename (pem key)', default=options['key-filename'], dest='key_filename')
     parser.add_argument('-l', '--loglevel', help='The chef log level to use', default=options['loglevel'], dest='loglevel', choices=['debug', 'info', 'warn', 'error', 'fatal'])

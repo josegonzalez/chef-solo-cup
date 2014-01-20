@@ -15,6 +15,11 @@ def sync(args, config, logger=None):
         run_dry('if [ -d {1}/.git ]; then cd {1} && git pull origin master; else rm -rf {1} && git clone {0} {1}; fi'.format(args.repository, args.chef_file_dest), args, logger=logger)
     else:
         with settings(hide('stdout'), warn_only=True):
-            rsync_project_dry(args, logger=logger, extra_opts="-Caz", delete=True, exclude=".git", local_dir="./", remote_dir=args.chef_file_dest, capture=True)
+            rsync_exclusions = args.rsync_exclusions
+            if not rsync_exclusions:
+                rsync_exclusions = []
+            rsync_exclusions.append('.git')
 
-    sudo_dry("chmod -R a+w {0}".format(args.chef_file_dest), args, logger=logger)
+            rsync_project_dry(args, logger=logger, extra_opts="-Caz", delete=True, exclude=rsync_exclusions, local_dir="./", remote_dir=args.chef_file_dest, capture=True)
+
+    return sudo_dry("chmod -R a+w {0}".format(args.chef_file_dest), args, logger=logger)
