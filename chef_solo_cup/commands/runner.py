@@ -47,14 +47,14 @@ def run_command(args, config, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    run_dry(args.cmd, args, logger=logger)
+    return run_dry(args.cmd, args, logger=logger)
 
 
 def sudo_command(args, config, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    sudo_dry(args.cmd, args, logger=logger)
+    return sudo_dry(args.cmd, args, logger=logger)
 
 
 def run_in_serial(args, hosts, logger=None):
@@ -157,11 +157,13 @@ def _run_command(host, config, commands, args, logger):
         if args.command == 'bootstrap':
             env.abort_on_prompts = True
             bootstrap(args, config, logger=logger)
-            update(args, config, logger=logger)
+            return update(args, config, delete_files=True, logger=logger)
         elif args.command in commands:
-            commands[args.command](args, config, logger=logger)
+            return commands[args.command](args, config, logger=logger)
     except NetworkError as e:
         logger.exception("There was a network error: {0}".format(e.message))
+        return False
+    except:
         return False
 
     return True
