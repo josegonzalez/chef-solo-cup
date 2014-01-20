@@ -78,10 +78,12 @@ def run_in_parallel(args, hosts, logger=None):
         task_queue.put({'host': host, 'config': hosts[host]})
 
     _colors = dict(red=31, green=32, yellow=33,
-                   blue=34, magenta=35, cyan=36)
+                   blue=34, magenta=35, cyan=36,
+                   _red=31, _green=32, _yellow=33,
+                   _blue=34, _magenta=35, _cyan=36)
 
     workers = []
-    pool_size = 6  # we don't have more colors than this :P
+    pool_size = 12  # we don't have more colors than this :P
     for worker_id in range(pool_size):
         color = _colors.pop(random.choice(_colors.keys()), None)
         tmp = multiprocessing.Process(target=_worker,
