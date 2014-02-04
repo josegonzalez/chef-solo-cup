@@ -18,6 +18,7 @@ def parse_args():
         "ip-address": None,
         "key-filename": None,
         "loglevel": "info",
+        "log-path": None,
         "output": None,
         "parallel": False,
         "providers": None,
@@ -81,6 +82,7 @@ def parse_args():
     parser.add_argument('-i', '--ip-address', help='The ip address to connect to', default=options['ip-address'], dest='ip_address')
     parser.add_argument('-k', '--key-filename', help='full path to key filename (pem key)', default=options['key-filename'], dest='key_filename')
     parser.add_argument('-l', '--loglevel', help='The chef log level to use', default=options['loglevel'], dest='loglevel', choices=['debug', 'info', 'warn', 'error', 'fatal'])
+    parser.add_argument('-L', '--log-path', help='The path to write logs to', default=options['log-path'], dest='log_path')
     parser.add_argument('-o', '--output', help='file to pipe output to (in addition to stdout)', default=options['output'], dest='output')
     parser.add_argument('-P', '--parallel', help='whether to run commands in parallel', default=options['parallel'], dest='parallel', action='store_true')
     parser.add_argument('-p', '--providers', help='space-separated list of providers', default=options['providers'], dest='providers', nargs='*')
