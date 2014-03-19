@@ -125,41 +125,43 @@ def get_asg_hosts(args, dna_path):
             except EC2ResponseError:
                 continue
 
+
+            group_name = group.name.strip()
             group_dna_file = None
             for asg_dna_file in asg_dna_files:
-                if asg_dna_file == group.name:
+                if asg_dna_file == group_name:
                     group_dna_file = asg_dna_file
                     break
 
-                group_name_json = group.name + '.json'
+                group_name_json = group_name + '.json'
                 if asg_dna_file == group_name_json:
                     group_dna_file = asg_dna_file
                     break
 
             if not group_dna_file:
                 for asg_dna_file in asg_dna_files:
-                    if group.name.startswith(asg_dna_file):
+                    if group_name.startswith(asg_dna_file):
                         group_dna_file = asg_dna_file
                         break
 
                     stripped_asg_dna_file = asg_dna_file.replace('.json', '')
-                    if group.name.startswith(stripped_asg_dna_file):
+                    if group_name.startswith(stripped_asg_dna_file):
                         group_dna_file = asg_dna_file
                         break
 
 
             if not group_dna_file:
-                group_dna_file = group.name
+                group_dna_file = group_name
 
             instances = [i for r in reservations for i in r.instances]
             for instance in instances:
-                name = '{0}_{1}'.format(group.name, instance.id)
+                name = '{0}_{1}'.format(group_name, instance.id)
                 yield name, {
-                    'file': name,
+                    'file': name.strip(),
                     'region': region,
                     'provider': 'AWS',
                     'public_ip': instance.ip_address,
-                    'dna_path': os.path.join(args.asg_dna_path, group_dna_file),
+                    'dna_path': os.path.join(args.asg_dna_path, group_dna_file.strip()),
                 }
 
 
