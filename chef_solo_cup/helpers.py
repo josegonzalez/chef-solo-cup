@@ -91,7 +91,12 @@ def get_filesystem_hosts(args, dna_path):
                 'region': region,
                 'provider': provider,
                 'service': service,
-                'dna_path': "dna/{0}/{1}/{2}/{3}".format(service, provider, region, f)
+                'dna_path': "dna/{0}/{1}/{2}/{3}".format(
+                    service,
+                    provider,
+                    region,
+                    f
+                )
             }
 
 
@@ -114,8 +119,13 @@ def get_asg_hosts(args, dna_path):
             aws_secret_access_key=args.aws_secret_access_key,
         )
 
-        asg_path = os.path.join(os.path.realpath(os.getcwd()), args.asg_dna_path)
-        asg_dna_files = [ f for f in os.listdir(asg_path) if os.path.isfile(os.path.join(asg_path, f)) ]
+        cwd = os.path.realpath(os.getcwd())
+        asg_path = os.path.join(cwd, args.asg_dna_path)
+
+        asg_dna_files = []
+        for f in os.listdir(asg_path):
+            if os.path.isfile(os.path.join(asg_path, f)):
+                asg_dna_files.append(f)
 
         for group in auto_scale_conn.get_all_groups():
             instance_ids = [i.instance_id for i in group.instances]
@@ -126,7 +136,6 @@ def get_asg_hosts(args, dna_path):
                 reservations = conn.get_all_instances(instance_ids)
             except EC2ResponseError:
                 continue
-
 
             group_name = group.name.strip()
             group_dna_file = None
@@ -151,7 +160,6 @@ def get_asg_hosts(args, dna_path):
                         group_dna_file = asg_dna_file
                         break
 
-
             if not group_dna_file:
                 group_dna_file = group_name
 
@@ -163,7 +171,10 @@ def get_asg_hosts(args, dna_path):
                     'region': region,
                     'provider': 'AWS',
                     'public_ip': instance.ip_address,
-                    'dna_path': os.path.join(args.asg_dna_path, group_dna_file.strip()),
+                    'dna_path': os.path.join(
+                        args.asg_dna_path,
+                        group_dna_file.strip()
+                    ),
                 }
 
 
@@ -172,11 +183,11 @@ def rsync_project_dry(args, logger=None, **kwargs):
         logger = setup_custom_logger('chef-solo-cup', args)
 
     if args.dry_run:
-        logger.info("[RSYNC_PROJECT] From {0} to {1} with opts='{2}' excluding='{3}'".format(kwargs.get('local_dir'), kwargs.get('remote_dir'), kwargs.get('extra_opts'), kwargs.get('exclude')))
+        logger.info("[RSYNC_PROJECT] From {0} to {1} with opts='{2}' excluding='{3}'".format(kwargs.get('local_dir'), kwargs.get('remote_dir'), kwargs.get('extra_opts'), kwargs.get('exclude')))  # noqa
     else:
         out = rsync_project(**kwargs)
         if out.return_code != 0:
-            logger.info("[RSYNC_PROJECT] Failed command with status code {0}, please run `chef-solo-cup clean` against this node".format(out.return_code))
+            logger.info("[RSYNC_PROJECT] Failed command with status code {0}, please run `chef-solo-cup clean` against this node".format(out.return_code))  # noqa
             sys.exit(0)
 
 
@@ -204,7 +215,7 @@ def add_line_if_not_present_dry(args, filename, line, run_f=run, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    cmd = "grep -q -e '%s' %s || echo '%s' >> %s" % (line, filename, line, filename)
+    cmd = "grep -q -e '{0}' {1} || echo '{0}' >> {1}".format(line, filename)
     if args.dry_run:
         logger.info("[SUDO] {0}".format(cmd))
     else:
