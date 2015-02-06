@@ -28,21 +28,21 @@ from chef_solo_cup.commands.sync import sync
 from chef_solo_cup.commands.test import test
 from chef_solo_cup.commands.update import update
 
-COLORS = [31, 32, 33, 34, 35, 36, 37 ]
+COLORS = [31, 32, 33, 34, 35, 36, 37]
 
 
 def list_commands():
     return {
-      'default': default,
-      'clean': clean,
-      'gem': gem,
-      'inspect': inspect,
-      'ruby': ruby,
-      'run': run_command,
-      'sudo': sudo_command,
-      'sync': sync,
-      'test': test,
-      'update': update,
+        'default': default,
+        'clean': clean,
+        'gem': gem,
+        'inspect': inspect,
+        'ruby': ruby,
+        'run': run_command,
+        'sudo': sudo_command,
+        'sync': sync,
+        'test': test,
+        'update': update,
     }
 
 
@@ -70,6 +70,7 @@ def run_in_serial(args, hosts, logger=None):
 
         _run_command(host, config, commands, args, logger)
 
+
 def run_in_parallel(args, hosts, logger=None):
     logger.info("Running commands in parallel mode")
     commands = list_commands()
@@ -80,10 +81,20 @@ def run_in_parallel(args, hosts, logger=None):
     for host in hosts.keys():
         task_queue.put({'host': host, 'config': hosts[host]})
 
-    _colors = dict(red=31, green=32, yellow=33,
-                   blue=34, magenta=35, cyan=36,
-                   _red=31, _green=32, _yellow=33,
-                   _blue=34, _magenta=35, _cyan=36)
+    _colors = {
+        'red': 31,
+        'green': 32,
+        'yellow': 33,
+        'blue': 34,
+        'magenta': 35,
+        'cyan': 36,
+        '_red': 31,
+        '_green': 32,
+        '_yellow': 33,
+        '_blue': 34,
+        '_magenta': 35,
+        '_cyan': 36,
+    }
 
     run_time = int(time.time())
 
@@ -91,8 +102,16 @@ def run_in_parallel(args, hosts, logger=None):
     pool_size = 12  # we don't have more colors than this :P
     for worker_id in range(pool_size):
         color = _colors.pop(random.choice(_colors.keys()), None)
-        tmp = multiprocessing.Process(target=_worker,
-                                      args=(worker_id, task_queue, result_queue, commands, color, run_time, args, logger))
+        tmp = multiprocessing.Process(target=_worker, args=(
+            worker_id,
+            task_queue,
+            result_queue,
+            commands,
+            color,
+            run_time,
+            args,
+            logger
+        ))
         tmp.start()
         workers.append(tmp)
 
@@ -110,22 +129,42 @@ def run_in_parallel(args, hosts, logger=None):
     while not result_queue.empty():
         result = result_queue.get()
         logger.info('{0}: {1}'.format(result['host'], str(result['success'])))
-        # pass  # return of each command can be accessed via result_queue.get(block=False)
+        # return of each command can be accessed
+        # via result_queue.get(block=False)
 
 
-def _worker(worker_id, task_queue, result_queue, commands, color, run_time, args, logger):
+def _worker(worker_id,
+            task_queue,
+            result_queue,
+            commands,
+            color,
+            run_time,
+            args,
+            logger):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     while not task_queue.empty():
         try:
             task = task_queue.get(block=False)
-            logger = _update_handlers(logger, color, task['host'], run_time, args)
+            logger = _update_handlers(
+                logger,
+                color,
+                task['host'],
+                run_time,
+                args
+            )
             logger.info("Running {0} against {1}".format(
                 args.command,
                 task['host']
             ))
 
-            response = _run_command(task['host'], task['config'], commands, args, logger)
+            response = _run_command(
+                task['host'],
+                task['config'],
+                commands,
+                args,
+                logger
+            )
 
             success = response
             if type(success) != bool:
@@ -149,21 +188,26 @@ def _update_handlers(logger, color, host, run_time, args):
         if args.output is not None:
             output = args.output
         elif args.log_path is not None:
-            output = os.path.join(os.path.realpath(args.log_path), str(run_time), host + '.log')
-            _make_sure_path_exists(os.path.realpath(args.log_path))
-            _make_sure_path_exists(os.path.join(os.path.realpath(args.log_path), str(run_time)))
+            log_path = os.path.realpath(args.log_path)
+            output = os.path.join(log_path, str(run_time), host + '.log')
+            _make_sure_path_exists(log_path)
+            _make_sure_path_exists(os.path.join(log_path, str(run_time)))
 
-
+    base_format = '[%(asctime)s] %(levelname)-7s %(message)s'
     if output is not None:
-        fileFormatter = logging.Formatter('[%(asctime)s] %(levelname)-7s %(message)s')
-        fileHandler = logging.FileHandler(output)
-        fileHandler.setFormatter(fileFormatter)
-        logger.addHandler(fileHandler)
+        formatter = logging.Formatter(base_format)
+        handler = logging.FileHandler(output)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
-    streamFormatter = logging.Formatter('\x1b[{0};1m[{1}]\x1b[0m [%(asctime)s] %(levelname)-7s %(message)s'.format(color, host))
-    streamHandler = logging.StreamHandler()
-    streamHandler.setFormatter(streamFormatter)
-    logger.addHandler(streamHandler)
+    formatter = logging.Formatter('\x1b[{0};1m[{1}]\x1b[0m {2}'.format(
+        color,
+        host,
+        base_format
+    ))
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
     sys.stdout = StreamToLogger(logger, logging.INFO)
     sys.stderr = StreamToLogger(logger, logging.ERROR)

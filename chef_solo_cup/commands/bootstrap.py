@@ -24,8 +24,22 @@ def bootstrap(args, config, logger=None):
     sudo_dry("apt-get update", args, logger=logger)
     sudo_dry("apt-get upgrade -y", args, logger=logger)
     sudo_dry("apt-get update", args, logger=logger)
-    sudo_dry("apt-get install -y build-essential git-core curl libssl-dev libxslt-dev libxml2-dev libreadline-dev zlib1g-dev", args, logger=logger)
-    sudo_dry("apt-get install -y binutils-doc gcc autoconf flex bison libtool", args, logger=logger)
+    sudo_dry("apt-get install -y {0}".format(' '.join([
+        'autoconf',
+        'binutils-doc',
+        'bison',
+        'build-essential',
+        'curl',
+        'flex',
+        'gcc',
+        'git-core',
+        'libreadline-dev',
+        'libssl-dev',
+        'libtool',
+        'libxml2-dev',
+        'libxslt-dev',
+        'zlib1g-dev',
+    ])), args, logger=logger)
 
     ruby(args, config, logger=logger)
 

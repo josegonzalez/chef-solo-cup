@@ -11,5 +11,12 @@ def gem(args, config, logger=None):
         logger = setup_custom_logger('chef-solo-cup', args)
 
     logger.info("-> Installing Chef ...")
-    sudo_dry('gem install -v {0} ohai --no-rdoc --no-ri'.format(args.ohai_version), args, logger=logger)
-    sudo_dry('gem install -v {0} chef --no-rdoc --no-ri'.format(args.chef_version), args, logger=logger)
+    gem_install_command = 'gem install -v {0} {1} --no-rdoc --no-ri'
+    sudo_dry(gem_install_command.format(
+        args.ohai_version,
+        'ohai'
+    ), args, logger=logger)
+    return sudo_dry(gem_install_command.format(
+        args.chef_version,
+        'chef'
+    ), args, logger=logger)

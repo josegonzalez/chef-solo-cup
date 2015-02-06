@@ -11,4 +11,12 @@ def ruby(args, config, logger=None):
         logger = setup_custom_logger('chef-solo-cup', args)
 
     logger.info("-> Installing Ruby 1.9.2")
-    return sudo_dry("apt-get install -y ruby1.9.1 ruby1.9.1-dev rubygems1.9.1 irb1.9.1 ri1.9.1 rdoc1.9.1 libopenssl-ruby1.9.1", args, logger=logger)
+    return sudo_dry("apt-get install -y {0}".format(' '.join([
+        'ruby1.9.1',
+        'ruby1.9.1-dev',
+        'rubygems1.9.1',
+        'irb1.9.1',
+        'ri1.9.1',
+        'rdoc1.9.1',
+        'libopenssl-ruby1.9.1',
+    ])), args, logger=logger)

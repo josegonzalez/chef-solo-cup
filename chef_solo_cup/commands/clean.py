@@ -10,4 +10,6 @@ def clean(args, config, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    return sudo_dry('rm -rf {0}'.format(args.chef_file_dest), args, logger=logger)
+    return sudo_dry('rm -rf {0}'.format(
+        args.chef_file_dest
+    ), args, logger=logger)
