@@ -8,6 +8,9 @@ import re
 
 def parse_args():
     defaults = {
+        "api-password": None,
+        "api-url": None,
+        "api-username": None,
         "asg-dna-path": "dna/asg",
         "aws-access-key-id": None,
         "aws-secret-access-key": None,
@@ -254,6 +257,26 @@ def parse_args():
         default=False,
         help='Print version and exit'
     )
+
+    parser.add_argument(
+        '--api-password',
+        default=options['api-password'],
+        dest='api_password',
+        help='basic auth password for api'
+    )
+    parser.add_argument(
+        '--api-url',
+        default=options['api-url'],
+        dest='api_url',
+        help='backing url for api'
+    )
+    parser.add_argument(
+        '--api-username',
+        default=options['api-username'],
+        dest='api_username',
+        help='basic auth username for api'
+    )
+
     parser.add_argument(
         '--dry-run',
         action='store_true',
