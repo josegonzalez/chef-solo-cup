@@ -107,7 +107,7 @@ def parse_args():
         '-c',
         '--command',
         default=options['command'],
-        dest='cmd',
+        dest='command',
         help='command to run'
     )
     parser.add_argument(
@@ -294,4 +294,4 @@ def parse_args():
         help='AWS Secret Key'
     )
 
-    return parser.parse_args()
+    return vars(parser.parse_args())

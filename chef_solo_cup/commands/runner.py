@@ -2,7 +2,6 @@
 
 from __future__ import with_statement
 
-import argparse
 import errno
 import logging
 import multiprocessing
@@ -50,14 +49,14 @@ def run_command(args, config, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    return run_dry(args.cmd, args, logger=logger)
+    return run_dry(args['command'], args, logger=logger)
 
 
 def sudo_command(args, config, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    return sudo_dry(args.cmd, args, logger=logger)
+    return sudo_dry(args['command'], args, logger=logger)
 
 
 def run_in_serial(args, hosts, logger=None):
@@ -66,7 +65,7 @@ def run_in_serial(args, hosts, logger=None):
 
     for host in sorted(hosts.keys()):
         config = hosts[host]
-        logger.info("Running {0} against {1}".format(args.command, host))
+        logger.info("Running {0} against {1}".format(args['command'], host))
 
         _run_command(host, config, commands, args, logger)
 
@@ -154,7 +153,7 @@ def _worker(worker_id,
                 args
             )
             logger.info("Running {0} against {1}".format(
-                args.command,
+                args['command'],
                 task['host']
             ))
 
@@ -180,15 +179,15 @@ def _worker(worker_id,
 
 
 def _update_handlers(logger, color, host, run_time, args):
-    has_args = args is not None and type(args) == argparse.Namespace
+    has_args = args is not None and type(args) is dict
 
     logger.handlers = []
     output = None
     if has_args:
-        if args.output is not None:
-            output = args.output
-        elif args.log_path is not None:
-            log_path = os.path.realpath(args.log_path)
+        if args['output'] is not None:
+            output = args['output']
+        elif args['log_path'] is not None:
+            log_path = os.path.realpath(args['log_path'])
             output = os.path.join(log_path, str(run_time), host + '.log')
             _make_sure_path_exists(log_path)
             _make_sure_path_exists(os.path.join(log_path, str(run_time)))
@@ -224,25 +223,25 @@ def _make_sure_path_exists(path):
 
 def _run_command(host, config, commands, args, logger):
     env.use_ssh_config = True
-    env.user = args.user
+    env.user = args['user']
 
-    if args.ip_address:
-        env.host = args.ip_address
-        env.host_string = args.ip_address
+    if args['ip_address']:
+        env.host = args['ip_address']
+        env.host_string = args['ip_address']
     else:
         env.host = host
         env.host_string = config.get('public_ip', host)
 
-    if args.key_filename:
-        env.key_filename = [args.key_filename, ]
+    if args['key_filename']:
+        env.key_filename = [args['key_filename'], ]
 
     try:
-        if args.command == 'bootstrap':
+        if args['command'] == 'bootstrap':
             env.abort_on_prompts = True
             bootstrap(args, config, logger=logger)
             return update(args, config, delete_files=True, logger=logger)
-        elif args.command in commands:
-            return commands[args.command](args, config, logger=logger)
+        elif args['command'] in commands:
+            return commands[args['command']](args, config, logger=logger)
     except NetworkError as e:
         logger.exception("There was a network error: {0}".format(e.message))
         return False

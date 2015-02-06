@@ -23,12 +23,12 @@ def get_hosts(args, logger=None):
     hosts = {}
 
     includes = []
-    if args.dna_patterns:
-        includes = map(lambda x: re.compile(x), args.dna_patterns)
+    if args['dna_patterns']:
+        includes = map(lambda x: re.compile(x), args['dna_patterns'])
 
     excludes = []
-    if args.exclude:
-        excludes = map(lambda x: re.compile(x), args.exclude)
+    if args['exclude']:
+        excludes = map(lambda x: re.compile(x), args['exclude'])
 
     all_hosts = itertools.chain(
         get_filesystem_hosts(args, dna_path),
@@ -49,18 +49,18 @@ def get_hosts(args, logger=None):
             if skip is None:
                 continue
 
-        if args.regions and data.get('region') not in args.regions:
+        if args['regions'] and data.get('region') not in args['regions']:
             continue
-        if args.providers and data.get('provider') not in args.providers:
+        if args['providers'] and data.get('provider') not in args['providers']:
             continue
-        if args.services and data.get('service') not in args.services:
+        if args['services'] and data.get('service') not in args['services']:
             continue
         hosts[host] = data
 
     hosts = collections.OrderedDict(sorted(hosts.items()))
 
-    if args.quantity is not None:
-        x = itertools.islice(hosts.items(), 0, int(args.quantity))
+    if args['quantity'] is not None:
+        x = itertools.islice(hosts.items(), 0, int(args['quantity']))
         hosts = {}
         for key, value in x:
             hosts[key] = value
@@ -101,26 +101,26 @@ def get_filesystem_hosts(args, dna_path):
 
 
 def get_asg_hosts(args, dna_path):
-    if not args.regions:
+    if not args['regions']:
         return
 
-    if not args.aws_access_key_id or not args.aws_secret_access_key:
+    if not args['aws_access_key_id'] or not args['aws_secret_access_key']:
         return
 
-    for region in args.regions:
+    for region in args['regions']:
         auto_scale_conn = boto.ec2.autoscale.connect_to_region(
             region,
-            aws_access_key_id=args.aws_access_key_id,
-            aws_secret_access_key=args.aws_secret_access_key,
+            aws_access_key_id=args['aws_access_key_id'],
+            aws_secret_access_key=args['aws_secret_access_key'],
         )
         conn = connect_to_region(
             region,
-            aws_access_key_id=args.aws_access_key_id,
-            aws_secret_access_key=args.aws_secret_access_key,
+            aws_access_key_id=args['aws_access_key_id'],
+            aws_secret_access_key=args['aws_secret_access_key'],
         )
 
         cwd = os.path.realpath(os.getcwd())
-        asg_path = os.path.join(cwd, args.asg_dna_path)
+        asg_path = os.path.join(cwd, args['asg_dna_path'])
 
         asg_dna_files = []
         for f in os.listdir(asg_path):
@@ -172,7 +172,7 @@ def get_asg_hosts(args, dna_path):
                     'provider': 'AWS',
                     'public_ip': instance.ip_address,
                     'dna_path': os.path.join(
-                        args.asg_dna_path,
+                        args['asg_dna_path'],
                         group_dna_file.strip()
                     ),
                 }
@@ -182,7 +182,7 @@ def rsync_project_dry(args, logger=None, **kwargs):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    if args.dry_run:
+    if args['dry_run']:
         logger.info("[RSYNC_PROJECT] From {0} to {1} with opts='{2}' excluding='{3}'".format(kwargs.get('local_dir'), kwargs.get('remote_dir'), kwargs.get('extra_opts'), kwargs.get('exclude')))  # noqa
     else:
         out = rsync_project(**kwargs)
@@ -195,7 +195,7 @@ def run_dry(cmd, args, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    if args.dry_run:
+    if args['dry_run']:
         logger.info("[RUN] {0}".format(cmd))
     else:
         return run(cmd)
@@ -205,7 +205,7 @@ def sudo_dry(cmd, args, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    if args.dry_run:
+    if args['dry_run']:
         logger.info("[SUDO] {0}".format(cmd))
     else:
         return sudo(cmd)
@@ -216,7 +216,7 @@ def add_line_if_not_present_dry(args, filename, line, run_f=run, logger=None):
         logger = setup_custom_logger('chef-solo-cup', args)
 
     cmd = "grep -q -e '{0}' {1} || echo '{0}' >> {1}".format(line, filename)
-    if args.dry_run:
+    if args['dry_run']:
         logger.info("[SUDO] {0}".format(cmd))
     else:
         run_f(cmd)

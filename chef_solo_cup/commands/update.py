@@ -19,11 +19,11 @@ def update(args, config, delete_files=False, logger=None):
         "`which chef-solo` -c {0}/{1} -j {0}/{2} -l {3}"
     ])
     if delete_files:
-        command += ' && rm -rf {0}'.format(args.chef_file_dest)
+        command += ' && rm -rf {0}'.format(args['chef_file_dest'])
 
     return sudo_dry(command.format(
-        args.chef_file_dest,
-        args.config_path,
+        args['chef_file_dest'],
+        args['config_path'],
         config.get('dna_path'),
-        args.loglevel
+        args['loglevel']
     ), args, logger=logger)

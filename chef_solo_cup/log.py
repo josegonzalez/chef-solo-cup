@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import argparse
 import logging
 
 
@@ -13,7 +12,7 @@ def setup_custom_logger(name, args=None, output=None, formatter=None):
     if logger.handlers:
         logger.handlers = []
 
-    has_args = args is not None and type(args) == argparse.Namespace
+    has_args = args is not None and type(args) is dict
     is_debug = has_args and args.debug is True
 
     if not logger.handlers:

@@ -13,10 +13,10 @@ def gem(args, config, logger=None):
     logger.info("-> Installing Chef ...")
     gem_install_command = 'gem install -v {0} {1} --no-rdoc --no-ri'
     sudo_dry(gem_install_command.format(
-        args.ohai_version,
+        args['ohai_version'],
         'ohai'
     ), args, logger=logger)
     return sudo_dry(gem_install_command.format(
-        args.chef_version,
+        args['chef_version'],
         'chef'
     ), args, logger=logger)

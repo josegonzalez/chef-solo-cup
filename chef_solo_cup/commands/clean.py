@@ -11,5 +11,5 @@ def clean(args, config, logger=None):
         logger = setup_custom_logger('chef-solo-cup', args)
 
     return sudo_dry('rm -rf {0}'.format(
-        args.chef_file_dest
+        args['chef_file_dest']
     ), args, logger=logger)

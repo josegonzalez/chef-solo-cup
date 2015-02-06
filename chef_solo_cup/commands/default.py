@@ -18,8 +18,8 @@ def default(args, config, logger=None):
         "`which chef-solo` -c {0}/{1} -j {0}/dna/{2} -l {3}"
     ])
     return sudo_dry(command.format(
-        args.chef_file_dest,
-        args.config_path,
+        args['chef_file_dest'],
+        args['config_path'],
         'default.json',
-        args.loglevel
+        args['loglevel']
     ), args, logger=logger)
