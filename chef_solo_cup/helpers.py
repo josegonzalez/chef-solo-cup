@@ -121,7 +121,7 @@ def get_asg_hosts(args, dna_path, logger=None):
     response = _get_api_response(args, region=None, logger=logger)
     if response:
         for region in args['regions']:
-            groups = _group_by_region(response, region)
+            groups = _group_from_region(response, region)
             for group, instances in groups.items():
                 group_name = group.strip()
                 group_dna_file = _get_group_dna_file(group_name, asg_dna_files)
@@ -169,7 +169,7 @@ def get_asg_hosts(args, dna_path, logger=None):
                     }
 
 
-def _group_by_region(response, region):
+def _group_from_region(response, region):
     groups = {}
     for group, instances in response.items():
         in_region = False
@@ -179,10 +179,9 @@ def _group_by_region(response, region):
 
         if not in_region:
             continue
-
-        groups[region] = {}
+        groups[group] = {}
         for name, instance in instances.items():
-            groups[region][name] = instance
+            groups[group][name] = instance
 
     return groups
 
