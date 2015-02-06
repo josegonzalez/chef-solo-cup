@@ -21,15 +21,15 @@ version(args)
 logger = setup_custom_logger('chef-solo-cup', args)
 hosts = helpers.get_hosts(args, logger=logger)
 
-if args.dry_run:
+if args['dry_run']:
     logger.info("Running in dry-run mode, commands will not be executed")
 
 logger.info("Matched hosts: " + str(sorted(hosts.keys())))
 
-if args.ip_address and len(hosts.keys()) > 1:
+if args['ip_address'] and len(hosts.keys()) > 1:
     sys.exit("You cannot specify --ip-address with more than 1 matching host")
 
-if args.parallel and not args.ip_address:
+if args['parallel'] and not args['ip_address']:
     run_in_parallel(args, hosts, logger=logger)
 else:
     run_in_serial(args, hosts, logger=logger)

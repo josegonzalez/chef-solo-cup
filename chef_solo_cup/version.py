@@ -8,7 +8,7 @@ from chef_solo_cup.log import setup_custom_logger
 
 
 def version(args):
-    if args.version:
+    if args['version']:
         formatter = logging.Formatter('%(message)s')
         logger = setup_custom_logger(
             'chef-solo-cup',

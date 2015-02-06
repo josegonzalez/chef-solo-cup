@@ -13,7 +13,7 @@ def setup_custom_logger(name, args=None, output=None, formatter=None):
         logger.handlers = []
 
     has_args = args is not None and type(args) is dict
-    is_debug = has_args and args.debug is True
+    is_debug = has_args and args['debug'] is True
 
     if not logger.handlers:
         if formatter is None:
@@ -22,7 +22,7 @@ def setup_custom_logger(name, args=None, output=None, formatter=None):
 
         handler = logging.StreamHandler()
         if output is None and has_args:
-            output = args.output
+            output = args['output']
 
         if output is not None:
             handler = logging.FileHandler(output)
