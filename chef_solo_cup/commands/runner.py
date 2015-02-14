@@ -261,8 +261,9 @@ class StreamToLogger(object):
         self.linebuf = ''
 
     def write(self, buf):
-        for line in buf.rstrip().splitlines():
-            self.logger.log(self.log_level, line.rstrip())
+        lines = [line.rstrip() for line in buf.rstrip().splitlines()]
+        lines = [line for line in lines if line[-6:] != '] out:']
+        [self.logger.log(self.log_level, line) for line in lines]
 
     def flush(self):
         pass
