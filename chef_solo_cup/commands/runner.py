@@ -49,14 +49,14 @@ def run_command(args, config, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    return run_dry(args['command'], args, logger=logger)
+    return run_dry(args['cmd'], args, logger=logger)
 
 
 def sudo_command(args, config, logger=None):
     if logger is None:
         logger = setup_custom_logger('chef-solo-cup', args)
 
-    return sudo_dry(args['command'], args, logger=logger)
+    return sudo_dry(args['cmd'], args, logger=logger)
 
 
 def run_in_serial(args, hosts, logger=None):

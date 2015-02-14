@@ -110,7 +110,7 @@ def parse_args():
         '-c',
         '--command',
         default=options['command'],
-        dest='command',
+        dest='cmd',
         help='command to run'
     )
     parser.add_argument(
