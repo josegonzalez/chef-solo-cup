@@ -14,6 +14,8 @@ def parse_args():
         "asg-dna-path": "dna/asg",
         "aws-access-key-id": None,
         "aws-secret-access-key": None,
+        "blacklist-rule": None,
+        "blacklist-rules": None,
         "command": False,
         "config-path": "solo-config.rb",
         "dna-patterns": None,
@@ -105,6 +107,13 @@ def parse_args():
         default=options['asg-dna-path'],
         dest='asg_dna_path',
         help='Path to asg dna files (relative to repo base)'
+    )
+    parser.add_argument(
+        '-b',
+        '--blacklist-rule',
+        default=options['blacklist-rule'],
+        dest='blacklist_rule',
+        help='pattern to use to blacklist hosts'
     )
     parser.add_argument(
         '-c',
@@ -317,4 +326,10 @@ def parse_args():
         help='AWS Secret Key'
     )
 
-    return vars(parser.parse_args())
+    args = vars(parser.parse_args())
+    args['blacklist_rules'] = options['blacklist-rules']
+    if args['blacklist_rule']:
+        args['blacklist-rules'][args['command']] = [
+            args['blacklist_rule']
+        ]
+    return args

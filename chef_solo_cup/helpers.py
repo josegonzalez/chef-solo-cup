@@ -60,6 +60,7 @@ def get_hosts(args, logger=None):
             continue
         hosts[host] = data
 
+    hosts = filter_hosts(args, hosts, logger=logger)
     hosts = collections.OrderedDict(sorted(hosts.items()))
 
     if args['quantity'] is not None:
@@ -323,3 +324,32 @@ def add_line_if_not_present_dry(args, filename, line, run_f=run, logger=None):
         logger.info("[SUDO] {0}".format(cmd))
     else:
         run_f(cmd)
+
+
+def filter_hosts(args, hosts, logger=None):
+    rules = args['blacklist_rules'].get(args['command'])
+    if not rules:
+        return hosts
+
+    excludes = []
+    for rule in rules:
+        if rule.startswith('/') and rule.endswith('/'):
+            pattern = rule[1:-1]
+            if not pattern:
+                continue
+
+            excludes.append(pattern)
+        else:
+            excludes.append(rule)
+
+    excludes = map(lambda x: re.compile(x), excludes)
+    new_hosts = {}
+
+    for host, config in hosts.items():
+        skip = map(lambda regex: regex.search(host), excludes)
+        skip = reduce(lambda x, y: x or y, skip)
+        if skip:
+            continue
+        new_hosts[host] = config
+
+    return new_hosts
