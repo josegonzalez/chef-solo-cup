@@ -28,7 +28,7 @@ def sync(args, config, logger=None):
         ), args, logger=logger)
     else:
         with settings(hide('stdout'), warn_only=True):
-            rsync_exclusions = args['rsync_exclusions']
+            rsync_exclusions = list(args['rsync_exclusions'])
             if not rsync_exclusions:
                 rsync_exclusions = []
             rsync_exclusions.append('.git')
