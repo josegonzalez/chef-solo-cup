@@ -87,6 +87,7 @@ def parse_args():
         'command',
         choices=[
             'bootstrap',
+            'chef',
             'clean',
             'default',
             'gem',

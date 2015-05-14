@@ -18,6 +18,7 @@ from fabric.exceptions import NetworkError
 from chef_solo_cup.helpers import run_dry, sudo_dry
 from chef_solo_cup.log import setup_custom_logger
 from chef_solo_cup.commands.bootstrap import bootstrap
+from chef_solo_cup.commands.chef import chef
 from chef_solo_cup.commands.clean import clean
 from chef_solo_cup.commands.default import default
 from chef_solo_cup.commands.gem import gem
@@ -33,6 +34,7 @@ COLORS = [31, 32, 33, 34, 35, 36, 37]
 def list_commands():
     return {
         'default': default,
+        'chef': chef,
         'clean': clean,
         'gem': gem,
         'inspect': inspect,
