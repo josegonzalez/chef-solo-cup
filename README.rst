@@ -21,104 +21,102 @@ Usage
 =====
 
 CLI Usage is as follows::
-```
-usage: chef-solo-cup [-h] [-a ASG_DNA_PATH] [-b BLACKLIST_RULE] [-c CMD]
-                     [-C CONFIG_PATH] [-d DNA_PATTERNS [DNA_PATTERNS ...]]
-                     [-D] [-e EXCLUDE [EXCLUDE ...]]
-                     [-E RSYNC_EXCLUSIONS [RSYNC_EXCLUSIONS ...]]
-                     [-i IP_ADDRESS] [-k KEY_FILENAME]
-                     [-l {debug,info,warn,error,fatal}] [-L LOG_PATH]
-                     [-o OUTPUT] [-P] [-p [PROVIDERS [PROVIDERS ...]]]
-                     [-q QUANTITY] [-r [REGIONS [REGIONS ...]]]
-                     [-R REPOSITORY] [-s [SERVICES [SERVICES ...]]]
-                     [-S {git,rsync}] [-u USER] [-v]
-                     [--api-password API_PASSWORD] [--api-url API_URL]
-                     [--api-username API_USERNAME] [--dry-run]
-                     [--chef-version CHEF_VERSION]
-                     [--ohai-version OHAI_VERSION]
-                     [--chef-file-dest CHEF_FILE_DEST]
-                     [--aws-access-key-id AWS_ACCESS_KEY_ID]
-                     [--aws-secret-access-key AWS_SECRET_ACCESS_KEY]
-                     [--use-private-ips]
-                     [--use-alternate-databag USE_ALTERNATE_DATABAG]
 
-                     [{bootstrap,chef,clean,default,gem,inspect,ruby,run,sync,sudo,test,update}]
-
-Chef-solo-cup, a chef-solo wrapper
-
-positional arguments:
-  {bootstrap,chef,clean,default,gem,inspect,ruby,run,sync,sudo,test,update}
-                        command to run
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -a ASG_DNA_PATH, --asg-dna-path ASG_DNA_PATH
-                        Path to asg dna files (relative to repo base)
-  -b BLACKLIST_RULE, --blacklist-rule BLACKLIST_RULE
-                        pattern to use to blacklist hosts
-  -c CMD, --command CMD
-                        command to run
-  -C CONFIG_PATH, --config-path CONFIG_PATH
-                        relative path from chef file destination to solo
-                        config file
-  -d DNA_PATTERNS [DNA_PATTERNS ...], --dna-patterns DNA_PATTERNS [DNA_PATTERNS ...]
-                        space-separated list of patterns to match against dna
-                        filenames
-  -D, --debug           enable debug mode
-  -e EXCLUDE [EXCLUDE ...], --exclude EXCLUDE [EXCLUDE ...]
-                        A regex to exclude hosts by
-  -E RSYNC_EXCLUSIONS [RSYNC_EXCLUSIONS ...], --rsync-exclusions RSYNC_EXCLUSIONS [RSYNC_EXCLUSIONS ...]
-                        space-separated list of files to exclude in rsync
-  -i IP_ADDRESS, --ip-address IP_ADDRESS
-                        The ip address to connect to
-  -k KEY_FILENAME, --key-filename KEY_FILENAME
-                        full path to key filename (pem key)
-  -l {debug,info,warn,error,fatal}, --loglevel {debug,info,warn,error,fatal}
-                        The chef log level to use
-  -L LOG_PATH, --log-path LOG_PATH
-                        The path to write logs to
-  -o OUTPUT, --output OUTPUT
-                        file to pipe output to (in addition to stdout)
-  -P, --parallel        whether to run commands in parallel
-  -p [PROVIDERS [PROVIDERS ...]], --providers [PROVIDERS [PROVIDERS ...]]
-                        space-separated list of providers
-  -q QUANTITY, --quantity QUANTITY
-                        The number of nodes to provision
-  -r [REGIONS [REGIONS ...]], --regions [REGIONS [REGIONS ...]]
-                        space-separated list of regions
-  -R REPOSITORY, --repository REPOSITORY
-                        repository to use when cloning instead of using rsync
-  -s [SERVICES [SERVICES ...]], --services [SERVICES [SERVICES ...]]
-                        space-separated list of services
-  -S {git,rsync}, --sync {git,rsync}
-                        method to sync chef with
-  -u USER, --user USER  user to run commands as
-  -v, --version         Print version and exit
-  --api-password API_PASSWORD
-                        basic auth password for api
-  --api-url API_URL     backing url for api
-  --api-username API_USERNAME
-                        basic auth username for api
-  --dry-run             perform a dry run of all commands
-  --chef-version CHEF_VERSION
-                        chef version to install
-  --ohai-version OHAI_VERSION
-                        ohai version to install
-  --chef-file-dest CHEF_FILE_DEST
-                        chef file destination on disk
-  --aws-access-key-id AWS_ACCESS_KEY_ID
-                        AWS Access Key
-  --aws-secret-access-key AWS_SECRET_ACCESS_KEY
-                        AWS Secret Key
-  --use-private-ips     Connect to the instances via the private ip address
-                        instead of the public
-  --use-alternate-databag USE_ALTERNATE_DATABAG
-                        Use alternate databag instead of one defined by ASG
-                        name
-
+    usage: chef-solo-cup [-h] [-a ASG_DNA_PATH] [-b BLACKLIST_RULE] [-c CMD]
+                         [-C CONFIG_PATH] [-d DNA_PATTERNS [DNA_PATTERNS ...]]
+                         [-D] [-e EXCLUDE [EXCLUDE ...]]
+                         [-E RSYNC_EXCLUSIONS [RSYNC_EXCLUSIONS ...]]
+                         [-i IP_ADDRESS] [-k KEY_FILENAME]
+                         [-l {debug,info,warn,error,fatal}] [-L LOG_PATH]
+                         [-o OUTPUT] [-P] [-p [PROVIDERS [PROVIDERS ...]]]
+                         [-q QUANTITY] [-r [REGIONS [REGIONS ...]]]
+                         [-R REPOSITORY] [-s [SERVICES [SERVICES ...]]]
+                         [-S {git,rsync}] [-u USER] [-v]
+                         [--api-password API_PASSWORD] [--api-url API_URL]
+                         [--api-username API_USERNAME] [--dry-run]
+                         [--chef-version CHEF_VERSION]
+                         [--ohai-version OHAI_VERSION]
+                         [--chef-file-dest CHEF_FILE_DEST]
+                         [--aws-access-key-id AWS_ACCESS_KEY_ID]
+                         [--aws-secret-access-key AWS_SECRET_ACCESS_KEY]
+                         [--use-private-ips]
+                         [--use-alternate-databag USE_ALTERNATE_DATABAG]
+    
+                         [{bootstrap,chef,clean,default,gem,inspect,ruby,run,sync,sudo,test,update}]
+    
+    Chef-solo-cup, a chef-solo wrapper
+    
+    positional arguments:
+      {bootstrap,chef,clean,default,gem,inspect,ruby,run,sync,sudo,test,update}
+                            command to run
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -a ASG_DNA_PATH, --asg-dna-path ASG_DNA_PATH
+                            Path to asg dna files (relative to repo base)
+      -b BLACKLIST_RULE, --blacklist-rule BLACKLIST_RULE
+                            pattern to use to blacklist hosts
+      -c CMD, --command CMD
+                            command to run
+      -C CONFIG_PATH, --config-path CONFIG_PATH
+                            relative path from chef file destination to solo
+                            config file
+      -d DNA_PATTERNS [DNA_PATTERNS ...], --dna-patterns DNA_PATTERNS [DNA_PATTERNS ...]
+                            space-separated list of patterns to match against dna
+                            filenames
+      -D, --debug           enable debug mode
+      -e EXCLUDE [EXCLUDE ...], --exclude EXCLUDE [EXCLUDE ...]
+                            A regex to exclude hosts by
+      -E RSYNC_EXCLUSIONS [RSYNC_EXCLUSIONS ...], --rsync-exclusions RSYNC_EXCLUSIONS [RSYNC_EXCLUSIONS ...]
+                            space-separated list of files to exclude in rsync
+      -i IP_ADDRESS, --ip-address IP_ADDRESS
+                            The ip address to connect to
+      -k KEY_FILENAME, --key-filename KEY_FILENAME
+                            full path to key filename (pem key)
+      -l {debug,info,warn,error,fatal}, --loglevel {debug,info,warn,error,fatal}
+                            The chef log level to use
+      -L LOG_PATH, --log-path LOG_PATH
+                            The path to write logs to
+      -o OUTPUT, --output OUTPUT
+                            file to pipe output to (in addition to stdout)
+      -P, --parallel        whether to run commands in parallel
+      -p [PROVIDERS [PROVIDERS ...]], --providers [PROVIDERS [PROVIDERS ...]]
+                            space-separated list of providers
+      -q QUANTITY, --quantity QUANTITY
+                            The number of nodes to provision
+      -r [REGIONS [REGIONS ...]], --regions [REGIONS [REGIONS ...]]
+                            space-separated list of regions
+      -R REPOSITORY, --repository REPOSITORY
+                            repository to use when cloning instead of using rsync
+      -s [SERVICES [SERVICES ...]], --services [SERVICES [SERVICES ...]]
+                            space-separated list of services
+      -S {git,rsync}, --sync {git,rsync}
+                            method to sync chef with
+      -u USER, --user USER  user to run commands as
+      -v, --version         Print version and exit
+      --api-password API_PASSWORD
+                            basic auth password for api
+      --api-url API_URL     backing url for api
+      --api-username API_USERNAME
+                            basic auth username for api
+      --dry-run             perform a dry run of all commands
+      --chef-version CHEF_VERSION
+                            chef version to install
+      --ohai-version OHAI_VERSION
+                            ohai version to install
+      --chef-file-dest CHEF_FILE_DEST
+                            chef file destination on disk
+      --aws-access-key-id AWS_ACCESS_KEY_ID
+                            AWS Access Key
       --aws-secret-access-key AWS_SECRET_ACCESS_KEY
                             AWS Secret Key
-```
+      --use-private-ips     Connect to the instances via the private ip address
+                            instead of the public
+      --use-alternate-databag USE_ALTERNATE_DATABAG
+                            Use alternate databag instead of one defined by ASG
+                            name
+    
+
 
 ========
 UPCOMING
