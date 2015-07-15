@@ -40,6 +40,7 @@ def parse_args():
         "ohai-version": "6.14.0",
         "chef-file-dest": "/tmp/chef",
         "use-private-ips": False,
+        "use-alternate-databag": None,
     }
 
     cwd = os.path.realpath(os.getcwd())
@@ -334,7 +335,12 @@ def parse_args():
         dest='use_private_ips',
         help='Connect to the instances via the private ip address instead of the public'
     )
-
+    parser.add_argument(
+        '--use-alternate-databag',
+        default=options['use-alternate-databag'],
+        dest='use_alternate_databag',
+        help='Use alternate databag instead of one defined by ASG name'
+    )
     args = vars(parser.parse_args())
     args['blacklist_rules'] = options['blacklist-rules']
     if args['blacklist_rule']:
