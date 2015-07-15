@@ -18,7 +18,6 @@ from fabric.exceptions import NetworkError
 from chef_solo_cup.helpers import run_dry, sudo_dry
 from chef_solo_cup.log import setup_custom_logger
 from chef_solo_cup.commands.bootstrap import bootstrap
-from chef_solo_cup.commands.chef import chef
 from chef_solo_cup.commands.clean import clean
 from chef_solo_cup.commands.default import default
 from chef_solo_cup.commands.gem import gem
@@ -34,7 +33,6 @@ COLORS = [31, 32, 33, 34, 35, 36, 37]
 def list_commands():
     return {
         'default': default,
-        'chef': chef,
         'clean': clean,
         'gem': gem,
         'inspect': inspect,
@@ -232,7 +230,10 @@ def _run_command(host, config, commands, args, logger):
         env.host_string = args['ip_address']
     else:
         env.host = host
-        env.host_string = config.get('public_ip', host)
+        if args['use_private_ips']:
+            env.host_string = config.get('private_ip', host)
+        else:
+            env.host_string = config.get('public_ip', host)
 
     if args['key_filename']:
         env.key_filename = [args['key_filename'], ]

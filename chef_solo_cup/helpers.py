@@ -131,6 +131,7 @@ def get_asg_hosts(args, dna_path, logger=None):
                         'file': name.strip(),
                         'region': region,
                         'provider': 'AWS',
+                        'private_ip': instance['private_ip_address'],
                         'public_ip': instance['ip_address'],
                         'dna_path': os.path.join(
                             args['asg_dna_path'],
@@ -163,6 +164,7 @@ def get_asg_hosts(args, dna_path, logger=None):
                         'region': region,
                         'provider': 'AWS',
                         'public_ip': instance.ip_address,
+                        'private_ip': instance['private_ip_address'],
                         'dna_path': os.path.join(
                             args['asg_dna_path'],
                             group_dna_file.strip()

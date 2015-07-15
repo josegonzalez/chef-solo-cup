@@ -39,6 +39,7 @@ def parse_args():
         "chef-version": "10.16.4",
         "ohai-version": "6.14.0",
         "chef-file-dest": "/tmp/chef",
+        "use-private-ips": False,
     }
 
     cwd = os.path.realpath(os.getcwd())
@@ -325,6 +326,13 @@ def parse_args():
         default=options['aws-secret-access-key'],
         dest='aws_secret_access_key',
         help='AWS Secret Key'
+    )
+    parser.add_argument(
+        '--use-private-ips',
+        action='store_true',
+        default=options['use-private-ips'],
+        dest='use_private_ips',
+        help='Connect to the instances via the private ip address instead of the public'
     )
 
     args = vars(parser.parse_args())
