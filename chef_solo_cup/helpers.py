@@ -125,12 +125,16 @@ def get_asg_hosts(args, dna_path, logger=None):
             groups = _group_from_region(response, region)
             for group, instances in groups.items():
                 group_name = group.strip()
-                group_dna_file = _get_group_dna_file(group_name, asg_dna_files)
+                if args['use_alternate_databag']:
+                    group_dna_file = _get_group_dna_file(args['use_alternate_databag'], asg_dna_files)
+                else:
+                    group_dna_file = _get_group_dna_file(group_name, asg_dna_files)
                 for name, instance in instances.items():
                     yield name, {
                         'file': name.strip(),
                         'region': region,
                         'provider': 'AWS',
+                        'private_ip': instance['private_ip_address'],
                         'public_ip': instance['ip_address'],
                         'dna_path': os.path.join(
                             args['asg_dna_path'],
@@ -153,7 +157,10 @@ def get_asg_hosts(args, dna_path, logger=None):
                     continue
 
                 group_name = group.name.strip()
-                group_dna_file = _get_group_dna_file(group_name, asg_dna_files)
+                if args['use_alternate_databag']:
+                    group_dna_file = _get_group_dna_file(args['use_alternate_databag'], asg_dna_files)
+                else:
+                    group_dna_file = _get_group_dna_file(group_name, asg_dna_files)
 
                 instances = [i for r in reservations for i in r.instances]
                 for instance in instances:
@@ -163,6 +170,7 @@ def get_asg_hosts(args, dna_path, logger=None):
                         'region': region,
                         'provider': 'AWS',
                         'public_ip': instance.ip_address,
+                        'private_ip': instance['private_ip_address'],
                         'dna_path': os.path.join(
                             args['asg_dna_path'],
                             group_dna_file.strip()
