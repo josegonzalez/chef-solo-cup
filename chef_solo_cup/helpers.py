@@ -40,6 +40,7 @@ def get_hosts(args, logger=None):
 
     for host, data in all_hosts:
         f = data.get('file', '')
+        g = data.get('group_name', '')
         if len(excludes):
             skip = map(lambda regex: regex.search(f), excludes)
             skip = reduce(lambda x, y: x or y, skip)
@@ -47,8 +48,12 @@ def get_hosts(args, logger=None):
                 continue
 
         if len(includes):
-            skip = map(lambda regex: regex.search(f), includes)
-            skip = reduce(lambda x, y: x or y, skip)
+            if len(g) == 0:
+                skip = map(lambda regex: regex.search(f), includes)
+                skip = reduce(lambda x, y: x or y, skip)
+            else:
+                skip = map(lambda regex: regex.search(g), includes)
+                skip = reduce(lambda x, y: x or y, skip)
             if skip is None:
                 continue
 
@@ -136,6 +141,7 @@ def get_asg_hosts(args, dna_path, logger=None):
                         'provider': 'AWS',
                         'private_ip': instance['private_ip_address'],
                         'public_ip': instance['ip_address'],
+                        'group_name': instance['tags']['aws:autoscaling:groupName'],
                         'dna_path': os.path.join(
                             args['asg_dna_path'],
                             group_dna_file.strip()
@@ -171,6 +177,7 @@ def get_asg_hosts(args, dna_path, logger=None):
                         'provider': 'AWS',
                         'public_ip': instance.ip_address,
                         'private_ip': instance['private_ip_address'],
+                        'group_name': instance['tags']['aws:autoscaling:groupName'],
                         'dna_path': os.path.join(
                             args['asg_dna_path'],
                             group_dna_file.strip()
