@@ -344,7 +344,9 @@ def parse_args():
     args = vars(parser.parse_args())
     args['blacklist_rules'] = options['blacklist-rules']
     if args['blacklist_rule']:
-        args['blacklist-rules'][args['command']] = [
+        args['blacklist_rules'][args['command']] = [
             args['blacklist_rule']
         ]
+    if not args['blacklist_rules']:
+        args['blacklist_rules'] = {}
     return args
