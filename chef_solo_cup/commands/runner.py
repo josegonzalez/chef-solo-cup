@@ -65,11 +65,10 @@ def run_in_serial(args, hosts, logger=None):
     logger.info("Running commands in serial mode")
     commands = list_commands()
 
-    for host in sorted(hosts.keys()):
-        config = hosts[host]
+    for host, config in hosts.iteritems():
         logger.info("Running {0} against {1}".format(args['command'], host))
 
-        _run_command(host, config, commands, args, logger)
+        _run_command(config.get('host'), config, commands, args, logger)
 
 
 def run_in_parallel(args, hosts, logger=None):
@@ -79,8 +78,8 @@ def run_in_parallel(args, hosts, logger=None):
     task_queue = multiprocessing.Queue()
     result_queue = multiprocessing.Queue()
 
-    for host in hosts.keys():
-        task_queue.put({'host': host, 'config': hosts[host]})
+    for host, config in hosts.iteritems():
+        task_queue.put({'host': config.get('host'), 'config': config})
 
     _colors = {
         'red': 31,
@@ -232,10 +231,9 @@ def _run_command(host, config, commands, args, logger):
         env.host_string = args['ip_address']
     else:
         env.host = host
+        env.host_string = config.get('public_ip', host)
         if args['use_private_ips']:
             env.host_string = config.get('private_ip', host)
-        else:
-            env.host_string = config.get('public_ip', host)
 
     if args['key_filename']:
         env.key_filename = [args['key_filename'], ]

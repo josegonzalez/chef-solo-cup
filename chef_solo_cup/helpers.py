@@ -40,7 +40,6 @@ def get_hosts(args, logger=None):
 
     for host, data in all_hosts:
         f = data.get('file', '')
-        g = data.get('group_name', '')
         if len(excludes):
             skip = map(lambda regex: regex.search(f), excludes)
             skip = reduce(lambda x, y: x or y, skip)
@@ -48,12 +47,8 @@ def get_hosts(args, logger=None):
                 continue
 
         if len(includes):
-            if len(g) == 0:
-                skip = map(lambda regex: regex.search(f), includes)
-                skip = reduce(lambda x, y: x or y, skip)
-            else:
-                skip = map(lambda regex: regex.search(g), includes)
-                skip = reduce(lambda x, y: x or y, skip)
+            skip = map(lambda regex: regex.search(f), includes)
+            skip = reduce(lambda x, y: x or y, skip)
             if skip is None:
                 continue
 
@@ -63,6 +58,19 @@ def get_hosts(args, logger=None):
             continue
         if args['services'] and data.get('service') not in args['services']:
             continue
+
+        if 'public_ip' in data and not data['public_ip']:
+            del data['public_ip']
+        if 'private_ip' in data and not data['private_ip']:
+            del data['private_ip']
+
+        data['host'] = host
+        valid_hosts = [data.get('public_ip'), data.get('private_ip'), host]
+        for hostname in valid_hosts:
+            if hostname:
+                data['host'] = hostname
+                break
+
         hosts[host] = data
 
     hosts = filter_hosts(args, hosts, logger=logger)
