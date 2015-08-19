@@ -2,13 +2,11 @@
 
 from __future__ import with_statement
 
+import dummymp
 import errno
 import logging
-import multiprocessing
 import os
-import Queue
 import random
-import signal
 import sys
 import time
 
@@ -75,12 +73,6 @@ def run_in_parallel(args, hosts, logger=None):
     logger.info("Running commands in parallel mode")
     commands = list_commands()
 
-    task_queue = multiprocessing.Queue()
-    result_queue = multiprocessing.Queue()
-
-    for host, config in hosts.iteritems():
-        task_queue.put({'host': config.get('host'), 'config': config})
-
     _colors = {
         'red': 31,
         'green': 32,
@@ -98,85 +90,58 @@ def run_in_parallel(args, hosts, logger=None):
 
     run_time = int(time.time())
 
-    workers = []
-    pool_size = 12  # we don't have more colors than this :P
-    for worker_id in range(pool_size):
+    def _command_runner(_host, _config, _commands, _args, _logger):
         color = _colors.pop(random.choice(_colors.keys()), None)
-        tmp = multiprocessing.Process(target=_worker, args=(
-            worker_id,
-            task_queue,
-            result_queue,
-            commands,
+        __logger = _update_handlers(
+            _logger,
             color,
+            _host,
             run_time,
-            args,
-            logger
-        ))
-        tmp.start()
-        workers.append(tmp)
+            args
+        )
+        __logger.info("Running {0} against {1}".format(
+            _args['command'],
+            _host))
+        return _run_command(
+            _config.get('host'),
+            _config,
+            _commands,
+            _args,
+            __logger)
+
+    def update_start(total_completed, total_running, total_procs):
+        # Example of what this might output:
+        #     Starting process! (4 running, 4/10 completed)
+        logger.info("Starting process! (%i running, %i/%i completed)"
+                    % (total_running, total_completed, total_procs))
+
+    dummymp.set_start_callback(update_start)
+    dummymp.set_max_processes(12)
+    dummymp.set_priority_mode(dummymp.DUMMYMP_AGGRESSIVE)
+    dummymp.set_args_deepcopy(False)
+
+    for host, config in hosts.iteritems():
+        dummymp.run(_command_runner, host, config, commands, args, logger)
 
     try:
-        for worker in workers:
-            worker.join()
+        # Process everything until done. This blocks and doesn't move
+        # forward until that condition is met.
+        dummymp.process_until_done()
     except KeyboardInterrupt:
+        # Stop all of the currently running processes.
         print "\x1b[0m"
         print 'parent received ctrl-c'
-        for worker in workers:
-            worker.terminate()
-            worker.join()
+        dummymp.killall()
 
+    results = dummymp.get_returns()
     logger.info('Results from run:')
-    while not result_queue.empty():
-        result = result_queue.get()
-        logger.info('{0}: {1}'.format(result['host'], str(result['success'])))
-        # return of each command can be accessed
-        # via result_queue.get(block=False)
+    for i, response in results.iteritems():
+        success = response
+        if type(success) != bool:
+            success = response.return_code == 0
+        logger.info('{0}: {1}'.format(response, str(success)))
 
-
-def _worker(worker_id,
-            task_queue,
-            result_queue,
-            commands,
-            color,
-            run_time,
-            args,
-            logger):
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
-
-    while not task_queue.empty():
-        try:
-            task = task_queue.get(block=False)
-            logger = _update_handlers(
-                logger,
-                color,
-                task['host'],
-                run_time,
-                args
-            )
-            logger.info("Running {0} against {1}".format(
-                args['command'],
-                task['host']
-            ))
-
-            response = _run_command(
-                task['host'],
-                task['config'],
-                commands,
-                args,
-                logger
-            )
-
-            success = response
-            if type(success) != bool:
-                success = response.return_code == 0
-
-            result_queue.put({
-                'host': task['host'],
-                'dna_path': task['config']['dna_path'],
-                'success': success,
-            })
-        except Queue.Empty:
-            pass
+    return
 
 
 def _update_handlers(logger, color, host, run_time, args):

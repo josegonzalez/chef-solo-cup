@@ -1,2 +1,4 @@
 Fabric>=1.5.1
 boto>=2.15.0
+dummymp==0.5b2
+psutil>=2.0.0
