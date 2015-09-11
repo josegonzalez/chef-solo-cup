@@ -27,11 +27,11 @@ def get_hosts(args, logger=None):
 
     includes = []
     if args['dna_patterns']:
-        includes = map(lambda x: re.compile(x), args['dna_patterns'])
+        includes = map(lambda x: re.compile(x, re.I), args['dna_patterns'])
 
     excludes = []
     if args['exclude']:
-        excludes = map(lambda x: re.compile(x), args['exclude'])
+        excludes = map(lambda x: re.compile(x, re.I), args['exclude'])
 
     all_hosts = itertools.chain(
         get_filesystem_hosts(args, dna_path),
