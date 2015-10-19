@@ -31,7 +31,7 @@ CLI Usage is as follows::
                          [-o OUTPUT] [-P] [-p [PROVIDERS [PROVIDERS ...]]]
                          [-q QUANTITY] [-r [REGIONS [REGIONS ...]]]
                          [-R REPOSITORY] [-s [SERVICES [SERVICES ...]]]
-                         [-S {git,rsync}] [-u USER] [-v]
+                         [-S {git,rsync}] [-t TAGS [TAGS ...]] [-u USER] [-v]
                          [--api-password API_PASSWORD] [--api-url API_URL]
                          [--api-username API_USERNAME] [--dry-run]
                          [--chef-version CHEF_VERSION]
@@ -41,15 +41,14 @@ CLI Usage is as follows::
                          [--aws-secret-access-key AWS_SECRET_ACCESS_KEY]
                          [--use-private-ips]
                          [--use-alternate-databag USE_ALTERNATE_DATABAG]
-    
                          [{bootstrap,chef,clean,default,gem,inspect,ruby,run,sync,sudo,test,update}]
-    
+
     Chef-solo-cup, a chef-solo wrapper
-    
+
     positional arguments:
       {bootstrap,chef,clean,default,gem,inspect,ruby,run,sync,sudo,test,update}
                             command to run
-    
+
     optional arguments:
       -h, --help            show this help message and exit
       -a ASG_DNA_PATH, --asg-dna-path ASG_DNA_PATH
@@ -92,6 +91,8 @@ CLI Usage is as follows::
                             space-separated list of services
       -S {git,rsync}, --sync {git,rsync}
                             method to sync chef with
+      -t TAGS [TAGS ...], --tags TAGS [TAGS ...]
+                            tags to filter instances by
       -u USER, --user USER  user to run commands as
       -v, --version         Print version and exit
       --api-password API_PASSWORD
@@ -115,7 +116,9 @@ CLI Usage is as follows::
       --use-alternate-databag USE_ALTERNATE_DATABAG
                             Use alternate databag instead of one defined by ASG
                             name
-    
+
+    Chef Solo Cup is pwnage
+
 
 
 ========
@@ -315,4 +318,3 @@ Potential issues:
   * ``chef-solo-cup bulk`` might be able to toss a single ``dna.json`` at all the instances - as filtered by flags - so we can quickly run some recipes to update key infrastructure
 - No search capabilities, do not know inline what libraries are installed or packages etc.
   * Your recipes should be clear as to what library is installed on what node, so then you can infer this based upon the box group.
-

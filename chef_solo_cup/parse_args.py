@@ -34,6 +34,7 @@ def parse_args():
         "repository": None,
         "services": None,
         "sync": "rsync",
+        "tags": None,
         "user": "deploy",
         "dry-run": False,
         "chef-version": "10.16.4",
@@ -255,6 +256,14 @@ def parse_args():
         help='method to sync chef with'
     )
     parser.add_argument(
+        '-t',
+        '--tags',
+        default=options['tags'],
+        dest='tags',
+        help='tags to filter instances by',
+        nargs='+'
+    )
+    parser.add_argument(
         '-u',
         '--user',
         default=options['user'],
@@ -333,7 +342,7 @@ def parse_args():
         action='store_true',
         default=options['use-private-ips'],
         dest='use_private_ips',
-        help='Connect to the instances via the private ip address instead of the public'
+        help='Connect to the instances via the private ip address instead of the public'  # noqa
     )
     parser.add_argument(
         '--use-alternate-databag',

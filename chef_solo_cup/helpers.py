@@ -23,8 +23,6 @@ from chef_solo_cup.log import setup_custom_logger
 def get_hosts(args, logger=None):
     dna_path = os.path.join(os.path.realpath(os.getcwd()), 'dna')
 
-    hosts = {}
-
     includes = []
     if args['dna_patterns']:
         includes = map(lambda x: re.compile(x, re.I), args['dna_patterns'])
@@ -38,25 +36,25 @@ def get_hosts(args, logger=None):
         get_asg_hosts(args, dna_path, logger=logger),
     )
 
+    hosts = _collect_valid_hosts(all_hosts, excludes, includes, args)
+    hosts = filter_hosts(args, hosts, logger=logger)
+    hosts = collections.OrderedDict(sorted(hosts.items()))
+
+    if args['quantity'] is not None:
+        x = itertools.islice(hosts.items(), 0, int(args['quantity']))
+        hosts = {}
+        for key, value in x:
+            hosts[key] = value
+
+        hosts = collections.OrderedDict(sorted(hosts.items()))
+
+    return hosts
+
+
+def _collect_valid_hosts(all_hosts, excludes, includes, args):
+    hosts = {}
     for host, data in all_hosts:
-        f = data.get('file', '')
-        if len(excludes):
-            skip = map(lambda regex: regex.search(f), excludes)
-            skip = reduce(lambda x, y: x or y, skip)
-            if skip:
-                continue
-
-        if len(includes):
-            skip = map(lambda regex: regex.search(f), includes)
-            skip = reduce(lambda x, y: x or y, skip)
-            if skip is None:
-                continue
-
-        if args['regions'] and data.get('region') not in args['regions']:
-            continue
-        if args['providers'] and data.get('provider') not in args['providers']:
-            continue
-        if args['services'] and data.get('service') not in args['services']:
+        if _skip_host(data, excludes, includes, args):
             continue
 
         if 'public_ip' in data and not data['public_ip']:
@@ -73,18 +71,46 @@ def get_hosts(args, logger=None):
 
         hosts[host] = data
 
-    hosts = filter_hosts(args, hosts, logger=logger)
-    hosts = collections.OrderedDict(sorted(hosts.items()))
-
-    if args['quantity'] is not None:
-        x = itertools.islice(hosts.items(), 0, int(args['quantity']))
-        hosts = {}
-        for key, value in x:
-            hosts[key] = value
-
-        hosts = collections.OrderedDict(sorted(hosts.items()))
-
     return hosts
+
+
+def _skip_host(data, excludes, includes, args):
+    f = data.get('file', '')
+
+    for key, value in _resolve_tags(args).iteritems():
+        if value != data.get('tags', {}).get(key, None):
+            return True
+
+    if len(excludes):
+        skip = map(lambda regex: regex.search(f), excludes)
+        skip = reduce(lambda x, y: x or y, skip)
+        if skip:
+            return True
+
+    if len(includes):
+        skip = map(lambda regex: regex.search(f), includes)
+        skip = reduce(lambda x, y: x or y, skip)
+        if skip is None:
+            return True
+
+    if args['regions'] and data.get('region') not in args['regions']:
+        return True
+    if args['providers'] and data.get('provider') not in args['providers']:
+        return True
+    if args['services'] and data.get('service') not in args['services']:
+        return True
+    return False
+
+
+def _resolve_tags(args):
+    if not args.get('tags', None):
+        return {}
+
+    tags = {}
+    for tag in args.get('tags', {}):
+        key, value = tag.split('=')
+        tags[key] = value
+    return tags
 
 
 def get_filesystem_hosts(args, dna_path):
@@ -108,6 +134,7 @@ def get_filesystem_hosts(args, dna_path):
                 'region': region,
                 'provider': provider,
                 'service': service,
+                'tags': {},
                 'dna_path': "dna/{0}/{1}/{2}/{3}".format(
                     service,
                     provider,
@@ -139,9 +166,13 @@ def get_asg_hosts(args, dna_path, logger=None):
             for group, instances in groups.items():
                 group_name = group.strip()
                 if args['use_alternate_databag']:
-                    group_dna_file = _get_group_dna_file(args['use_alternate_databag'], asg_dna_files)
+                    group_dna_file = _get_group_dna_file(
+                        args['use_alternate_databag'],
+                        asg_dna_files)
                 else:
-                    group_dna_file = _get_group_dna_file(group_name, asg_dna_files)
+                    group_dna_file = _get_group_dna_file(
+                        group_name,
+                        asg_dna_files)
                 for name, instance in instances.items():
                     yield name, {
                         'file': name.strip(),
@@ -149,7 +180,8 @@ def get_asg_hosts(args, dna_path, logger=None):
                         'provider': 'AWS',
                         'private_ip': instance['private_ip_address'],
                         'public_ip': instance['ip_address'],
-                        'group_name': instance['tags']['aws:autoscaling:groupName'],
+                        'group_name': instance['tags']['aws:autoscaling:groupName'],  # noqa
+                        'tags': instance['tags'],
                         'dna_path': os.path.join(
                             args['asg_dna_path'],
                             group_dna_file.strip()
@@ -172,9 +204,13 @@ def get_asg_hosts(args, dna_path, logger=None):
 
                 group_name = group.name.strip()
                 if args['use_alternate_databag']:
-                    group_dna_file = _get_group_dna_file(args['use_alternate_databag'], asg_dna_files)
+                    group_dna_file = _get_group_dna_file(
+                        args['use_alternate_databag'],
+                        asg_dna_files)
                 else:
-                    group_dna_file = _get_group_dna_file(group_name, asg_dna_files)
+                    group_dna_file = _get_group_dna_file(
+                        group_name,
+                        asg_dna_files)
 
                 instances = [i for r in reservations for i in r.instances]
                 for instance in instances:
@@ -185,7 +221,8 @@ def get_asg_hosts(args, dna_path, logger=None):
                         'provider': 'AWS',
                         'public_ip': instance.ip_address,
                         'private_ip': instance['private_ip_address'],
-                        'group_name': instance['tags']['aws:autoscaling:groupName'],
+                        'group_name': instance['tags']['aws:autoscaling:groupName'],  # noqa
+                        'tags': instance['tags'],
                         'dna_path': os.path.join(
                             args['asg_dna_path'],
                             group_dna_file.strip()
