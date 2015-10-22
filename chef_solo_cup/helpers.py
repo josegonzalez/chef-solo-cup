@@ -9,6 +9,7 @@ import json
 import os
 import re
 import sys
+import unidecode
 import urllib2
 
 from boto.ec2 import connect_to_region
@@ -175,7 +176,7 @@ def get_asg_hosts(args, dna_path, logger=None):
                         asg_dna_files)
                 for name, instance in instances.items():
                     yield name, {
-                        'file': name.strip(),
+                        'file': slugify(name.strip()),
                         'region': region,
                         'provider': 'AWS',
                         'private_ip': instance['private_ip_address'],
@@ -216,7 +217,7 @@ def get_asg_hosts(args, dna_path, logger=None):
                 for instance in instances:
                     name = '{0}-{1}'.format(group_name, instance.id)
                     yield name, {
-                        'file': name.strip(),
+                        'file': slugify(name.strip()),
                         'region': region,
                         'provider': 'AWS',
                         'public_ip': instance.ip_address,
@@ -314,6 +315,7 @@ def _get_api_response(args, region=None, logger=None):
 
 
 def _get_group_dna_file(group_name, asg_dna_files):
+    group_name = slugify(group_name)
     group_dna_file = None
     for asg_dna_file in asg_dna_files:
         if asg_dna_file == group_name:
@@ -413,3 +415,14 @@ def filter_hosts(args, hosts, logger=None):
         new_hosts[host] = config
 
     return new_hosts
+
+
+def slugify(text):
+    if type(text) == unicode:
+        text = unidecode.unidecode(text)
+    text = text.strip()
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9_-]+', '-', text)
+    text = re.sub(r'-{2,}', '-', text)
+
+    return text
