@@ -37,7 +37,13 @@ def get_hosts(args, logger=None):
         get_asg_hosts(args, dna_path, logger=logger),
     )
 
-    hosts = _collect_valid_hosts(all_hosts, excludes, includes, args)
+    hosts = _collect_valid_hosts(
+        all_hosts,
+        excludes,
+        includes,
+        args,
+        logger=logger
+    )
     hosts = filter_hosts(args, hosts, logger=logger)
     hosts = collections.OrderedDict(sorted(hosts.items()))
 
@@ -52,10 +58,10 @@ def get_hosts(args, logger=None):
     return hosts
 
 
-def _collect_valid_hosts(all_hosts, excludes, includes, args):
+def _collect_valid_hosts(all_hosts, excludes, includes, args, logger=None):
     hosts = {}
     for host, data in all_hosts:
-        if _skip_host(data, excludes, includes, args):
+        if _skip_host(data, excludes, includes, args, logger=logger):
             continue
 
         if 'public_ip' in data and not data['public_ip']:
@@ -75,30 +81,36 @@ def _collect_valid_hosts(all_hosts, excludes, includes, args):
     return hosts
 
 
-def _skip_host(data, excludes, includes, args):
+def _skip_host(data, excludes, includes, args, logger=None):
     f = data.get('file', '')
 
     for key, value in _resolve_tags(args).iteritems():
         if value != data.get('tags', {}).get(key, None):
+            logger.debug('Skipping {0} because tags dont match'.format(f))
             return True
 
     if len(excludes):
         skip = map(lambda regex: regex.search(f), excludes)
         skip = reduce(lambda x, y: x or y, skip)
         if skip:
+            logger.debug('Skipping {0} because exclusion rule'.format(f))
             return True
 
     if len(includes):
         skip = map(lambda regex: regex.search(f), includes)
         skip = reduce(lambda x, y: x or y, skip)
         if skip is None:
+            logger.debug('Skipping {0} because inclusion rule'.format(f))
             return True
 
     if args['regions'] and data.get('region') not in args['regions']:
+        logger.debug('Skipping {0} because regions dont match'.format(f))
         return True
     if args['providers'] and data.get('provider') not in args['providers']:
+        logger.debug('Skipping {0} because providers dont match'.format(f))
         return True
     if args['services'] and data.get('service') not in args['services']:
+        logger.debug('Skipping {0} because services dont match'.format(f))
         return True
     return False
 
