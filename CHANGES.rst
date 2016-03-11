@@ -1,6 +1,17 @@
 Changelog
 =========
 
+0.2.0 (2016-03-11)
+------------------
+
+- Remove the json extension to ensure we do proper file matching. [Jose
+  Diaz-Gonzalez]
+
+  The `.json` extension would otherwise be sluggified, causing only partial matches and potentially incorrect ones.
+
+
+- Log more information on matching databag info. [Jose Diaz-Gonzalez]
+
 0.1.0 (2016-01-20)
 ------------------
 
