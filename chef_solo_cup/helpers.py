@@ -33,7 +33,7 @@ def get_hosts(args, logger=None):
         excludes = map(lambda x: re.compile(x, re.I), args['exclude'])
 
     all_hosts = itertools.chain(
-        get_filesystem_hosts(args, dna_path),
+        get_filesystem_hosts(args, dna_path, logger=logger),
         get_asg_hosts(args, dna_path, logger=logger),
     )
 
@@ -126,7 +126,7 @@ def _resolve_tags(args):
     return tags
 
 
-def get_filesystem_hosts(args, dna_path):
+def get_filesystem_hosts(args, dna_path, logger=None):
     for root, sub_folders, files in os.walk(dna_path):
         files = filter(lambda f: ".json" in f, files)
         for f in files:
@@ -186,6 +186,12 @@ def get_asg_hosts(args, dna_path, logger=None):
                     group_dna_file = _get_group_dna_file(
                         group_name,
                         asg_dna_files)
+
+                logger.debug('== [group:{0}] [use_alternate_databag:{1}] [databag:{2}]'.format(
+                    group,
+                    args['use_alternate_databag'],
+                    group_dna_file))
+
                 for name, instance in instances.items():
                     yield name, {
                         'file': slugify(name.strip()),
