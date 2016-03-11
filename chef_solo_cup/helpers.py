@@ -333,7 +333,7 @@ def _get_api_response(args, region=None, logger=None):
 
 
 def _get_group_dna_file(group_name, asg_dna_files):
-    group_name = slugify(group_name)
+    group_name = slugify(rchop(group_name, '.json'))
     group_dna_file = None
     for asg_dna_file in asg_dna_files:
         if asg_dna_file == group_name:
@@ -444,3 +444,9 @@ def slugify(text):
     text = re.sub(r'-{2,}', '-', text)
 
     return text
+
+
+def rchop(s, ending):
+  if s.endswith(ending):
+    return s[:-len(ending)]
+  return s
