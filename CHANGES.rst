@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.3.0 (2016-04-05)
+------------------
+
+- Allow deciding dna file to use by ec2 tag. [Jose Diaz-Gonzalez]
+
+- Properly format function. [Jose Diaz-Gonzalez]
+
 0.2.0 (2016-03-11)
 ------------------
 
