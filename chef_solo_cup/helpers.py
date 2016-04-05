@@ -203,7 +203,10 @@ def get_asg_hosts(args, dna_path, logger=None):
                         'tags': instance['tags'],
                         'dna_path': os.path.join(
                             args['asg_dna_path'],
-                            group_dna_file.strip()
+                            dna_file_name_from_tags(
+                                args,
+                                group_dna_file.strip(),
+                                instance['tags'])
                         ),
                     }
     else:
@@ -244,7 +247,10 @@ def get_asg_hosts(args, dna_path, logger=None):
                         'tags': instance['tags'],
                         'dna_path': os.path.join(
                             args['asg_dna_path'],
-                            group_dna_file.strip()
+                            dna_file_name_from_tags(
+                                args,
+                                group_dna_file.strip(),
+                                instance['tags'])
                         ),
                     }
 
@@ -360,6 +366,35 @@ def _get_group_dna_file(group_name, asg_dna_files):
         group_dna_file = group_name
 
     return group_dna_file
+
+
+def dna_file_name_from_tags(args, dna_file_name, tags):
+    env_tag = args['environment_tag']
+    strip_env = args['strip_environment_from_dna_file_run_tag']
+    tag = args['dna_file_tag']
+
+    if args['dna_file_tag'] and tags.get(args['dna_file_tag'], None):
+        dna_file_name = tags.get(tag, None)
+        if strip_env and env_tag and tags.get(env_tag, None):
+            environment = tags.get(env_tag, None)
+            dna_file_name = strip_left(dna_file_name, environment)
+            dna_file_name = strip_right(dna_file_name, environment)
+            dna_file_name = dna_file_name.strip('_-')
+
+    dna_file_name = rchop(dna_file_name, '.json') + '.json'
+    return dna_file_name
+
+
+def strip_right(text, suffix):
+    if not text.endswith(suffix):
+        return text
+    return text[:len(text)-len(suffix)]
+
+
+def strip_left(text, prefix):
+    if not text.startswith(prefix):
+        return text
+    return text[len(prefix):]
 
 
 def rsync_project_dry(args, logger=None, **kwargs):

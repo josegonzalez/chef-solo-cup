@@ -18,8 +18,10 @@ def parse_args():
         "blacklist-rules": None,
         "command": False,
         "config-path": "solo-config.rb",
+        "dna-file-tag": None,
         "dna-patterns": None,
         "debug": False,
+        "environment-tag": None,
         "exclude": None,
         "rsync-exclusions": None,
         "ip-address": None,
@@ -33,6 +35,7 @@ def parse_args():
         "regions": None,
         "repository": None,
         "services": None,
+        "strip-environment-from-dna-file-tag": False,
         "sync": "rsync",
         "tags": None,
         "user": "deploy",
@@ -142,12 +145,24 @@ def parse_args():
         nargs='+'
     )
     parser.add_argument(
+        '--dna-file-tag',
+        default=options['dna-file-tag'],
+        dest='dna_file_tag',
+        help='name of tag to retrieve dna filename from'
+    )
+    parser.add_argument(
         '-D',
         '--debug',
         action='store_true',
         default=options['debug'],
         dest='debug',
         help='enable debug mode'
+    )
+    parser.add_argument(
+        '--environment-tag',
+        default=options['environment-tag'],
+        dest='environment_tag',
+        help='name of tag to retrieve environment from'
     )
     parser.add_argument(
         '-e',
@@ -254,6 +269,13 @@ def parse_args():
         default=options['sync'],
         dest='sync',
         help='method to sync chef with'
+    )
+    parser.add_argument(
+        '--strip-environment-from-dna-file-run-tag',
+        action='store_true',
+        default=options['strip-environment-from-dna-file-tag'],
+        dest='strip_environment_from_dna_file_run_tag',
+        help='strip the environment specified in a tag from the dna-file name specified in a tag'
     )
     parser.add_argument(
         '-t',
