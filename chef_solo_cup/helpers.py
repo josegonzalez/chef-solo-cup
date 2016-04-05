@@ -447,6 +447,6 @@ def slugify(text):
 
 
 def rchop(s, ending):
-  if s.endswith(ending):
-    return s[:-len(ending)]
-  return s
+    if s.endswith(ending):
+        return s[:-len(ending)]
+    return s
