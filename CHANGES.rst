@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.3.1 (2016-04-21)
+------------------
+
+- Allow overriding when calling use-alternate-databag. [Jose Diaz-
+  Gonzalez]
+
 0.3.0 (2016-04-05)
 ------------------
 
