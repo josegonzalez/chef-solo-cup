@@ -373,7 +373,7 @@ def dna_file_name_from_tags(args, dna_file_name, tags):
     strip_env = args['strip_environment_from_dna_file_run_tag']
     tag = args['dna_file_tag']
 
-    if args['dna_file_tag'] and tags.get(args['dna_file_tag'], None):
+    if not args['use_alternate_databag'] and args['dna_file_tag'] and tags.get(args['dna_file_tag'], None):
         dna_file_name = tags.get(tag, None)
         if strip_env and env_tag and tags.get(env_tag, None):
             environment = tags.get(env_tag, None)
